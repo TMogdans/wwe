@@ -1,6 +1,7 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useEffect, useState } from "react";
 import { type RecipeDetail as RecipeDetailType, fetchRecipe } from "../api.js";
+import { EquipmentList } from "../components/EquipmentList.js";
 import { IngredientList } from "../components/IngredientList.js";
 import { PortionCalculator } from "../components/PortionCalculator.js";
 import { StepList } from "../components/StepList.js";
@@ -83,6 +84,9 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 					<Tabs.Trigger value="zutaten" className="detail-tab-trigger">
 						Zutaten
 					</Tabs.Trigger>
+					<Tabs.Trigger value="equipment" className="detail-tab-trigger">
+						Equipment
+					</Tabs.Trigger>
 					<Tabs.Trigger value="zubereitung" className="detail-tab-trigger">
 						Zubereitung
 					</Tabs.Trigger>
@@ -95,6 +99,10 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 						onChange={setServings}
 					/>
 					<IngredientList steps={recipe.steps} scale={scale} />
+				</Tabs.Content>
+
+				<Tabs.Content value="equipment">
+					<EquipmentList steps={recipe.steps} />
 				</Tabs.Content>
 
 				<Tabs.Content value="zubereitung">
