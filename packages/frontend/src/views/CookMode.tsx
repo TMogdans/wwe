@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type RecipeDetail, fetchRecipe } from "../api.js";
 import "../styles/cook-mode.css";
 
@@ -7,6 +7,10 @@ interface CookModeProps {
 }
 
 type Token = RecipeDetail["steps"][number]["tokens"][number];
+
+const SWIPE_THRESHOLD = 50;
+const MAX_FONT_SIZE = 32;
+const MIN_FONT_SIZE = 14;
 
 function tokenKey(token: Token, index: number): string {
 	switch (token.type) {
@@ -53,10 +57,35 @@ function renderToken(token: Token, index: number) {
 	}
 }
 
+function useFitText(deps: unknown[]) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const textRef = useRef<HTMLParagraphElement>(null);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		const text = textRef.current;
+		if (!container || !text) return;
+
+		let size = MAX_FONT_SIZE;
+		text.style.fontSize = `${size}px`;
+
+		while (text.scrollHeight > container.clientHeight && size > MIN_FONT_SIZE) {
+			size -= 1;
+			text.style.fontSize = `${size}px`;
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, deps);
+
+	return { containerRef, textRef };
+}
+
 export function CookMode({ slug }: CookModeProps) {
 	const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [currentStep, setCurrentStep] = useState(0);
+	const touchStartX = useRef(0);
+
+	const { containerRef, textRef } = useFitText([currentStep, recipe]);
 
 	useEffect(() => {
 		setRecipe(null);
@@ -66,6 +95,37 @@ export function CookMode({ slug }: CookModeProps) {
 			.then(setRecipe)
 			.catch(() => setError("Rezept konnte nicht geladen werden."));
 	}, [slug]);
+
+	const totalSteps = recipe?.steps.length ?? 0;
+	const isFirstStep = currentStep === 0;
+	const isLastStep = currentStep === totalSteps - 1;
+
+	const handleBack = useCallback(() => {
+		if (!isFirstStep) {
+			setCurrentStep((prev) => prev - 1);
+		}
+	}, [isFirstStep]);
+
+	const handleNext = useCallback(() => {
+		if (isLastStep) {
+			window.location.hash = `/rezept/${slug}`;
+		} else {
+			setCurrentStep((prev) => prev + 1);
+		}
+	}, [isLastStep, slug]);
+
+	function handleTouchStart(e: React.TouchEvent) {
+		touchStartX.current = e.touches[0].clientX;
+	}
+
+	function handleTouchEnd(e: React.TouchEvent) {
+		const diff = e.changedTouches[0].clientX - touchStartX.current;
+		if (diff > SWIPE_THRESHOLD) {
+			handleBack();
+		} else if (diff < -SWIPE_THRESHOLD) {
+			handleNext();
+		}
+	}
 
 	const backUrl = `#/rezept/${slug}`;
 
@@ -98,30 +158,16 @@ export function CookMode({ slug }: CookModeProps) {
 		);
 	}
 
-	const totalSteps = recipe.steps.length;
-	const isFirstStep = currentStep === 0;
-	const isLastStep = currentStep === totalSteps - 1;
 	const progressPercent =
 		totalSteps > 1 ? ((currentStep + 1) / totalSteps) * 100 : 100;
-
 	const step = recipe.steps[currentStep];
 
-	function handleBack() {
-		if (!isFirstStep) {
-			setCurrentStep((prev) => prev - 1);
-		}
-	}
-
-	function handleNext() {
-		if (isLastStep) {
-			window.location.hash = `/rezept/${slug}`;
-		} else {
-			setCurrentStep((prev) => prev + 1);
-		}
-	}
-
 	return (
-		<div className="cook-mode">
+		<div
+			className="cook-mode"
+			onTouchStart={handleTouchStart}
+			onTouchEnd={handleTouchEnd}
+		>
 			<div className="cook-mode__header">
 				<span>
 					Schritt {currentStep + 1} von {totalSteps} &ndash; {recipe.name}
@@ -136,8 +182,10 @@ export function CookMode({ slug }: CookModeProps) {
 					style={{ width: `${progressPercent}%` }}
 				/>
 			</div>
-			<div className="cook-mode__step">
-				<p>{step.tokens.map((token, i) => renderToken(token, i))}</p>
+			<div className="cook-mode__step" ref={containerRef}>
+				<p ref={textRef}>
+					{step.tokens.map((token, i) => renderToken(token, i))}
+				</p>
 			</div>
 			<div className="cook-mode__nav">
 				<button type="button" onClick={handleBack} disabled={isFirstStep}>
