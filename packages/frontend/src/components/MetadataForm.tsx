@@ -10,9 +10,8 @@ interface MetadataFormProps {
 	isNew: boolean;
 	metadata: RecipeMetadata;
 	onMetadataChange: (metadata: RecipeMetadata) => void;
+	courseOptions: string[];
 }
-
-const COURSE_OPTIONS = ["", "dinner", "dessert", "dip"];
 
 export function MetadataForm({
 	name,
@@ -20,9 +19,10 @@ export function MetadataForm({
 	isNew,
 	metadata,
 	onMetadataChange,
+	courseOptions,
 }: MetadataFormProps) {
 	const isCustomCourse =
-		metadata.course !== "" && !COURSE_OPTIONS.includes(metadata.course);
+		metadata.course !== "" && !courseOptions.includes(metadata.course);
 
 	function handleCourseSelect(value: string) {
 		if (value === "__custom") {
@@ -82,16 +82,18 @@ export function MetadataForm({
 							id="metadata-course"
 							className="metadata-form__input"
 							value={
-								COURSE_OPTIONS.includes(metadata.course)
+								courseOptions.includes(metadata.course)
 									? metadata.course
 									: "__custom"
 							}
 							onChange={(e) => handleCourseSelect(e.target.value)}
 						>
 							<option value="">-- Kein Gang --</option>
-							<option value="dinner">Dinner</option>
-							<option value="dessert">Dessert</option>
-							<option value="dip">Dip</option>
+							{courseOptions.map((course) => (
+								<option key={course} value={course}>
+									{course.charAt(0).toUpperCase() + course.slice(1)}
+								</option>
+							))}
 							<option value="__custom">Eigener...</option>
 						</select>
 					)}

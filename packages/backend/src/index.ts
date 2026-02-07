@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import { createCategoriesRouter } from "./routes/categories.js";
 import { createRecipeRouter } from "./routes/recipes.js";
 import { createShoppingListRouter } from "./routes/shopping-list.js";
 
@@ -8,6 +9,7 @@ const app = express();
 const recipesDir = process.env.RECIPES_DIR ?? "./rezepte";
 
 app.use(express.json());
+app.use("/api/kategorien", createCategoriesRouter(recipesDir));
 app.use("/api/rezepte", createRecipeRouter(recipesDir));
 app.use("/api/einkaufsliste", createShoppingListRouter(recipesDir));
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
 	type RecipeDetail,
 	createRecipe,
+	fetchCourses,
 	fetchRecipe,
 	updateRecipe,
 } from "../api.js";
@@ -67,6 +68,7 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 	const [initialDoc, setInitialDoc] = useState<JSONContent | null>(
 		isNew ? EMPTY_DOC : null,
 	);
+	const [courseOptions, setCourseOptions] = useState<string[]>([]);
 
 	const editor = useEditor(
 		{
@@ -81,6 +83,10 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 		},
 		[initialDoc],
 	);
+
+	useEffect(() => {
+		fetchCourses().then(setCourseOptions);
+	}, []);
 
 	useEffect(() => {
 		if (!slug) return;
@@ -158,6 +164,7 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 				isNew={isNew}
 				metadata={metadata}
 				onMetadataChange={setMetadata}
+				courseOptions={courseOptions}
 			/>
 
 			<EditorToolbar editor={editor} />

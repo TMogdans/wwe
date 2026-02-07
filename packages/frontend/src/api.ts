@@ -75,6 +75,12 @@ export async function deleteRecipe(slug: string): Promise<void> {
 	if (!res.ok) throw new Error("Failed to delete recipe");
 }
 
+export async function fetchCourses(): Promise<string[]> {
+	const res = await fetch("/api/kategorien");
+	if (!res.ok) return [];
+	return res.json();
+}
+
 export async function generateShoppingList(
 	slugs: string[],
 ): Promise<AggregatedIngredient[]> {

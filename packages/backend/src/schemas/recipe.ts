@@ -28,4 +28,6 @@ export const shoppingListRequestSchema = z.object({
 export type RecipeSummary = z.infer<typeof recipeSummarySchema>;
 export type CreateRecipeRequest = z.infer<typeof createRecipeSchema>;
 export type UpdateRecipeRequest = z.infer<typeof updateRecipeSchema>;
+export const categoriesSchema = z.array(z.string());
+
 export type ShoppingListRequest = z.infer<typeof shoppingListRequestSchema>;
