@@ -1,0 +1,77 @@
+.cook-mode {
+	position: fixed;
+	inset: 0;
+	background: var(--color-bg);
+	display: flex;
+	flex-direction: column;
+	z-index: 100;
+}
+
+.cook-mode__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.cook-mode__progress {
+	height: 3px;
+	background: var(--color-border);
+}
+
+.cook-mode__progress-bar {
+	height: 100%;
+	background: var(--color-primary);
+	transition: width 0.3s ease;
+}
+
+.cook-mode__step {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: clamp(1.2rem, 4vw, 1.8rem);
+	line-height: 1.8;
+	text-align: center;
+	padding: 2rem;
+}
+
+.cook-mode__nav {
+	display: flex;
+	gap: 1rem;
+	padding: 1.5rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.cook-mode__nav button {
+	flex: 1;
+	font-size: 1.2rem;
+	padding: 1rem 2rem;
+	min-height: 48px;
+	border-radius: var(--radius);
+	border: 1px solid var(--color-border);
+	cursor: pointer;
+	background: var(--color-surface);
+	font-family: inherit;
+}
+
+.cook-mode__nav button:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.cook-mode__nav button.primary {
+	background: var(--color-primary);
+	color: white;
+	border-color: var(--color-primary);
+}
+
+.cook-mode__close {
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	cursor: pointer;
+	padding: 0.5rem;
+	line-height: 1;
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./styles/global.css";
+import { CookMode } from "./views/CookMode.js";
 import { RecipeDetail } from "./views/RecipeDetail.js";
 import { RecipeOverview } from "./views/RecipeOverview.js";
 
@@ -24,9 +25,7 @@ export function App() {
 
 	const cookMatch = route.match(/^\/rezept\/(.+)\/kochen$/);
 	if (cookMatch) {
-		return (
-			<div>Kochmodus: {decodeURIComponent(cookMatch[1])} (Placeholder)</div>
-		);
+		return <CookMode slug={decodeURIComponent(cookMatch[1])} />;
 	}
 
 	const editMatch = route.match(/^\/rezept\/(.+)\/bearbeiten$/);
