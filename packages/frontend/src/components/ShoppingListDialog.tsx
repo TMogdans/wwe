@@ -1,4 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import type { AggregatedIngredient } from "../api.js";
 
 interface ShoppingListDialogProps {
@@ -19,14 +20,35 @@ function formatAsPlainText(items: AggregatedIngredient[]): string {
 	return lines.join("\n");
 }
 
+function copyToClipboard(text: string): boolean {
+	if (navigator.clipboard) {
+		navigator.clipboard.writeText(text);
+		return true;
+	}
+	const textarea = document.createElement("textarea");
+	textarea.value = text;
+	textarea.style.position = "fixed";
+	textarea.style.opacity = "0";
+	document.body.appendChild(textarea);
+	textarea.select();
+	const success = document.execCommand("copy");
+	document.body.removeChild(textarea);
+	return success;
+}
+
 export function ShoppingListDialog({
 	open,
 	onOpenChange,
 	items,
 }: ShoppingListDialogProps) {
-	async function handleCopy() {
+	const [copied, setCopied] = useState(false);
+
+	function handleCopy() {
 		const text = formatAsPlainText(items);
-		await navigator.clipboard.writeText(text);
+		if (copyToClipboard(text)) {
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		}
 	}
 
 	return (
@@ -56,7 +78,7 @@ export function ShoppingListDialog({
 							className="dialog-btn dialog-btn-primary"
 							onClick={handleCopy}
 						>
-							Kopieren
+							{copied ? "Kopiert!" : "Kopieren"}
 						</button>
 						<Dialog.Close asChild>
 							<button type="button" className="dialog-btn">
