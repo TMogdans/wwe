@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./styles/global.css";
+import { RecipeDetail } from "./views/RecipeDetail.js";
 import { RecipeOverview } from "./views/RecipeOverview.js";
 
 function useHashRoute() {
@@ -35,11 +36,7 @@ export function App() {
 
 	const detailMatch = route.match(/^\/rezept\/(.+)$/);
 	if (detailMatch) {
-		return (
-			<div>
-				Rezeptdetail: {decodeURIComponent(detailMatch[1])} (Placeholder)
-			</div>
-		);
+		return <RecipeDetail slug={decodeURIComponent(detailMatch[1])} />;
 	}
 
 	if (route === "/neu") {
