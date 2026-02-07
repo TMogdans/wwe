@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./styles/global.css";
+import { RecipeOverview } from "./views/RecipeOverview.js";
 
 function useHashRoute() {
 	const [hash, setHash] = useState(window.location.hash.slice(1) || "/");
@@ -17,7 +18,7 @@ export function App() {
 	const route = useHashRoute();
 
 	if (route === "/" || route === "") {
-		return <div>Rezeptuebersicht (Placeholder)</div>;
+		return <RecipeOverview />;
 	}
 
 	const cookMatch = route.match(/^\/rezept\/(.+)\/kochen$/);

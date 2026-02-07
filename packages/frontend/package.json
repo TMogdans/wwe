@@ -8,6 +8,7 @@
 		"test": "vitest run --passWithNoTests"
 	},
 	"dependencies": {
+		"@radix-ui/react-dialog": "^1.1.15",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"zod": "catalog:"
