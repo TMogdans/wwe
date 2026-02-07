@@ -31,7 +31,7 @@ Zweiten Schritt machen.`;
 		expect(recipe.steps).toHaveLength(2);
 	});
 
-	it("treats consecutive non-empty lines as one step", () => {
+	it("treats each non-empty line as its own step", () => {
 		const input = `>> servings: 2
 
 Zeile eins.
@@ -39,7 +39,7 @@ Zeile zwei.
 
 Neuer Schritt.`;
 		const recipe = parseRecipe(input);
-		expect(recipe.steps).toHaveLength(2);
+		expect(recipe.steps).toHaveLength(3);
 	});
 
 	it("parses a real recipe file", () => {

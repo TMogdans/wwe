@@ -46,14 +46,13 @@ export function serializeRecipe(recipe: CooklangRecipe): string {
 		parts.push(`>> ${key}: ${recipe.metadata[key]}`);
 	}
 
-	// Serialize steps
-	for (const step of recipe.steps) {
-		// Add empty line separator before each step
-		// (after metadata or after previous step)
-		if (parts.length > 0) {
-			parts.push("");
-		}
+	// Blank line between metadata and steps
+	if (metadataKeys.length > 0 && recipe.steps.length > 0) {
+		parts.push("");
+	}
 
+	// Serialize steps (one per line)
+	for (const step of recipe.steps) {
 		const stepText = step.tokens.map(serializeToken).join("");
 		parts.push(stepText);
 	}
