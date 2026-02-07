@@ -19,7 +19,6 @@ export function RecipeCard({
 }: RecipeCardProps) {
 	function handleCheckboxClick(e: React.MouseEvent<HTMLInputElement>) {
 		e.stopPropagation();
-		e.preventDefault();
 		onToggleSelect();
 	}
 
