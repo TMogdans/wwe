@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./styles/global.css";
 import { CookMode } from "./views/CookMode.js";
 import { RecipeDetail } from "./views/RecipeDetail.js";
+import { RecipeEditor } from "./views/RecipeEditor.js";
 import { RecipeOverview } from "./views/RecipeOverview.js";
 
 function useHashRoute() {
@@ -30,7 +31,7 @@ export function App() {
 
 	const editMatch = route.match(/^\/rezept\/(.+)\/bearbeiten$/);
 	if (editMatch) {
-		return <div>Editor: {decodeURIComponent(editMatch[1])} (Placeholder)</div>;
+		return <RecipeEditor slug={decodeURIComponent(editMatch[1])} />;
 	}
 
 	const detailMatch = route.match(/^\/rezept\/(.+)$/);
@@ -39,7 +40,7 @@ export function App() {
 	}
 
 	if (route === "/neu") {
-		return <div>Neues Rezept (Placeholder)</div>;
+		return <RecipeEditor />;
 	}
 
 	return <div>404 – Seite nicht gefunden</div>;
