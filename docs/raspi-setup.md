@@ -60,6 +60,54 @@ docker run --rm hello-world
 4. Haken bei "Diesem Netzwerkgeraet immer die gleiche IPv4-Adresse zuweisen"
 5. Uebernehmen
 
+## 6. Bei GitHub Container Registry anmelden
+
+Du brauchst einen GitHub Personal Access Token (classic) mit dem Scope `read:packages`:
+
+1. https://github.com/settings/tokens/new oeffnen
+2. Note: `raspi-ghcr`
+3. Scope: nur `read:packages` ankreuzen
+4. Token generieren und kopieren
+
+Auf dem Raspi:
+```bash
+docker login ghcr.io -u TMogdans
+```
+Passwort = der eben erstellte Token. Die Anmeldung bleibt gespeichert.
+
+## 7. App deployen
+
+Projektverzeichnis auf dem Raspi anlegen und Rezepte hinkopieren:
+```bash
+mkdir -p ~/wwe/rezepte
+```
+
+Die `docker-compose.prod.yml` auf den Raspi kopieren (vom Mac aus):
+```bash
+scp docker-compose.prod.yml pi@rezepte.fritz.box:~/wwe/docker-compose.yml
+```
+
+Die Rezepte ruebersynchen (vom Mac aus):
+```bash
+scp rezepte/*.cook pi@rezepte.fritz.box:~/wwe/rezepte/
+```
+
+Auf dem Raspi starten:
+```bash
+cd ~/wwe
+docker compose pull
+docker compose up -d
+```
+
+## 8. Updates deployen
+
+Wenn du Aenderungen auf `main` pushst, baut GitHub Actions automatisch ein neues Image. Auf dem Raspi dann einfach:
+```bash
+cd ~/wwe
+docker compose pull
+docker compose up -d
+```
+
 ## Fertig
 
-Der Raspi ist bereit unter `http://rezepte.fritz.box`. Docker laeuft, und sobald der Container deployt wird, ist die App erreichbar.
+Die App ist erreichbar unter `http://rezepte.fritz.box`.
