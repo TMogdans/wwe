@@ -1,0 +1,88 @@
+export interface RecipeSummary {
+	slug: string;
+	name: string;
+	metadata: {
+		"time required"?: string;
+		course?: string;
+		servings?: string;
+	};
+}
+
+export interface RecipeDetail {
+	slug: string;
+	name: string;
+	metadata: Record<string, string>;
+	steps: Array<{
+		tokens: Array<
+			| { type: "text"; value: string }
+			| { type: "ingredient"; name: string; amount: string; unit: string }
+			| { type: "timer"; name: string; duration: string; unit: string }
+			| { type: "equipment"; name: string }
+		>;
+	}>;
+}
+
+export interface AggregatedIngredient {
+	name: string;
+	entries: Array<{
+		amount: string;
+		unit: string;
+		recipeName: string;
+	}>;
+}
+
+export async function fetchRecipes(): Promise<RecipeSummary[]> {
+	const res = await fetch("/api/rezepte");
+	if (!res.ok) throw new Error("Failed to fetch recipes");
+	return res.json();
+}
+
+export async function fetchRecipe(slug: string): Promise<RecipeDetail> {
+	const res = await fetch(`/api/rezepte/${encodeURIComponent(slug)}`);
+	if (!res.ok) throw new Error("Recipe not found");
+	return res.json();
+}
+
+export async function createRecipe(
+	name: string,
+	content: string,
+): Promise<RecipeSummary> {
+	const res = await fetch("/api/rezepte", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ name, content }),
+	});
+	if (!res.ok) throw new Error("Failed to create recipe");
+	return res.json();
+}
+
+export async function updateRecipe(
+	slug: string,
+	content: string,
+): Promise<void> {
+	const res = await fetch(`/api/rezepte/${encodeURIComponent(slug)}`, {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ content }),
+	});
+	if (!res.ok) throw new Error("Failed to update recipe");
+}
+
+export async function deleteRecipe(slug: string): Promise<void> {
+	const res = await fetch(`/api/rezepte/${encodeURIComponent(slug)}`, {
+		method: "DELETE",
+	});
+	if (!res.ok) throw new Error("Failed to delete recipe");
+}
+
+export async function generateShoppingList(
+	slugs: string[],
+): Promise<AggregatedIngredient[]> {
+	const res = await fetch("/api/einkaufsliste", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ slugs }),
+	});
+	if (!res.ok) throw new Error("Failed to generate shopping list");
+	return res.json();
+}
