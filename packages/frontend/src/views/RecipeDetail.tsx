@@ -112,7 +112,7 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 
 			<div className="detail-actions">
 				<a
-					href={`#/rezept/${slug}/kochen`}
+					href={`#/rezept/${slug}/kochen?portionen=${servings}`}
 					className="detail-btn detail-btn-primary"
 				>
 					Kochmodus starten

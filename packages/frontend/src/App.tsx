@@ -24,9 +24,16 @@ export function App() {
 		return <RecipeOverview />;
 	}
 
-	const cookMatch = route.match(/^\/rezept\/(.+)\/kochen$/);
+	const cookMatch = route.match(/^\/rezept\/(.+)\/kochen(?:\?(.*))?$/);
 	if (cookMatch) {
-		return <CookMode slug={decodeURIComponent(cookMatch[1])} />;
+		const params = new URLSearchParams(cookMatch[2] ?? "");
+		const portionen = params.get("portionen");
+		return (
+			<CookMode
+				slug={decodeURIComponent(cookMatch[1])}
+				portionen={portionen ? Number(portionen) : undefined}
+			/>
+		);
 	}
 
 	const editMatch = route.match(/^\/rezept\/(.+)\/bearbeiten$/);

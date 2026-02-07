@@ -4,6 +4,7 @@ import "../styles/cook-mode.css";
 
 interface CookModeProps {
 	slug: string;
+	portionen?: number;
 }
 
 type Token = RecipeDetail["steps"][number]["tokens"][number];
@@ -27,7 +28,23 @@ function tokenKey(token: Token, index: number): string {
 	}
 }
 
-function renderToken(token: Token, index: number) {
+function scaleAmount(amount: string, scale: number): string {
+	if (!amount) return "";
+	const num = Number(amount);
+	if (!Number.isNaN(num)) {
+		const scaled = num * scale;
+		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
+	}
+	const fractionMatch = amount.match(/^(\d+)\/(\d+)$/);
+	if (fractionMatch) {
+		const decimal = Number(fractionMatch[1]) / Number(fractionMatch[2]);
+		const scaled = decimal * scale;
+		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
+	}
+	return amount;
+}
+
+function renderToken(token: Token, index: number, scale: number) {
 	const key = tokenKey(token, index);
 	switch (token.type) {
 		case "text":
@@ -35,7 +52,7 @@ function renderToken(token: Token, index: number) {
 		case "ingredient":
 			return (
 				<span key={key} className="token-ingredient">
-					{token.amount ? `${token.amount} ` : ""}
+					{token.amount ? `${scaleAmount(token.amount, scale)} ` : ""}
 					{token.unit ? `${token.unit} ` : ""}
 					{token.name}
 				</span>
@@ -79,7 +96,13 @@ function useFitText(deps: unknown[]) {
 	return { containerRef, textRef };
 }
 
-export function CookMode({ slug }: CookModeProps) {
+function parseServings(value: string | undefined): number {
+	if (!value) return 4;
+	const match = value.match(/^(\d+)/);
+	return match ? Number(match[1]) : 4;
+}
+
+export function CookMode({ slug, portionen }: CookModeProps) {
 	const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [currentStep, setCurrentStep] = useState(0);
@@ -158,6 +181,9 @@ export function CookMode({ slug }: CookModeProps) {
 		);
 	}
 
+	const baseServings = parseServings(recipe.metadata.servings);
+	const scale = portionen ? portionen / baseServings : 1;
+
 	const progressPercent =
 		totalSteps > 1 ? ((currentStep + 1) / totalSteps) * 100 : 100;
 	const step = recipe.steps[currentStep];
@@ -184,7 +210,7 @@ export function CookMode({ slug }: CookModeProps) {
 			</div>
 			<div className="cook-mode__step" ref={containerRef}>
 				<p ref={textRef}>
-					{step.tokens.map((token, i) => renderToken(token, i))}
+					{step.tokens.map((token, i) => renderToken(token, i, scale))}
 				</p>
 			</div>
 			<div className="cook-mode__nav">
