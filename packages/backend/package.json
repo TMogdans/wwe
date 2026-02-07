@@ -1,0 +1,21 @@
+{
+	"name": "@wwe/backend",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsup",
+		"test": "vitest run --passWithNoTests"
+	},
+	"dependencies": {
+		"express": "^5.0.0",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.0",
+		"tsup": "^8.0.0",
+		"tsx": "^4.0.0",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	}
+}

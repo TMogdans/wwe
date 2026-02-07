@@ -1,0 +1,19 @@
+{
+	"name": "wwe",
+	"private": true,
+	"scripts": {
+		"dev": "pnpm --parallel -r dev",
+		"build": "pnpm -r build",
+		"test": "pnpm -r test",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"husky": "^9.1.7"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": ["esbuild"]
+	}
+}
