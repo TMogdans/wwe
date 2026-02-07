@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
 	type AggregatedIngredient,
 	type RecipeSummary,
+	fetchCourses,
 	fetchRecipes,
 	generateShoppingList,
 } from "../api.js";
@@ -12,6 +13,8 @@ import "../styles/overview.css";
 export function RecipeOverview() {
 	const [recipes, setRecipes] = useState<RecipeSummary[]>([]);
 	const [search, setSearch] = useState("");
+	const [courseFilter, setCourseFilter] = useState("");
+	const [courseOptions, setCourseOptions] = useState<string[]>([]);
 	const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [shoppingItems, setShoppingItems] = useState<AggregatedIngredient[]>(
@@ -23,11 +26,14 @@ export function RecipeOverview() {
 		fetchRecipes()
 			.then(setRecipes)
 			.catch(() => setError("Rezepte konnten nicht geladen werden."));
+		fetchCourses().then(setCourseOptions);
 	}, []);
 
-	const filtered = recipes.filter((r) =>
-		r.name.toLowerCase().includes(search.toLowerCase()),
-	);
+	const filtered = recipes.filter((r) => {
+		const matchesName = r.name.toLowerCase().includes(search.toLowerCase());
+		const matchesCourse = !courseFilter || r.metadata.course === courseFilter;
+		return matchesName && matchesCourse;
+	});
 
 	function toggleSelect(slug: string) {
 		setSelectedSlugs((prev) => {
@@ -62,6 +68,20 @@ export function RecipeOverview() {
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 				/>
+				{courseOptions.length > 0 && (
+					<select
+						className="overview-filter"
+						value={courseFilter}
+						onChange={(e) => setCourseFilter(e.target.value)}
+					>
+						<option value="">Alle Gänge</option>
+						{courseOptions.map((course) => (
+							<option key={course} value={course}>
+								{course.charAt(0).toUpperCase() + course.slice(1)}
+							</option>
+						))}
+					</select>
+				)}
 				<a href="#/neu" className="overview-new-link">
 					+ Neues Rezept
 				</a>

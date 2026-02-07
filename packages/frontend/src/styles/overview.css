@@ -33,6 +33,21 @@
 	outline-offset: -1px;
 }
 
+.overview-filter {
+	padding: 0.625rem 1rem;
+	font-size: 1rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	background: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-base);
+}
+
+.overview-filter:focus {
+	outline: 2px solid var(--color-primary);
+	outline-offset: -1px;
+}
+
 .overview-new-link {
 	display: inline-flex;
 	align-items: center;
