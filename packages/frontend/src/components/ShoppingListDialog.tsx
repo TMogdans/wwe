@@ -12,8 +12,9 @@ function formatAsPlainText(items: AggregatedIngredient[]): string {
 	const lines: string[] = [];
 	for (const item of items) {
 		for (const entry of item.entries) {
+			const prep = entry.preparation ? `, ${entry.preparation}` : "";
 			lines.push(
-				`${entry.amount} ${entry.unit} ${item.name} (${entry.recipeName})`,
+				`${entry.amount} ${entry.unit} ${item.name}${prep} (${entry.recipeName})`,
 			);
 		}
 	}
@@ -66,7 +67,9 @@ export function ShoppingListDialog({
 										key={`${entry.recipeName}-${entry.amount}-${entry.unit}`}
 										className="shopping-list-entry"
 									>
-										{entry.amount} {entry.unit} ({entry.recipeName})
+										{entry.amount} {entry.unit}
+										{entry.preparation && `, ${entry.preparation}`} (
+										{entry.recipeName})
 									</div>
 								))}
 							</li>

@@ -39,6 +39,7 @@ export interface AggregatedIngredient {
 	entries: Array<{
 		amount: string;
 		unit: string;
+		preparation: string;
 		recipeName: string;
 	}>;
 }

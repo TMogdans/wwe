@@ -83,6 +83,7 @@ export function StepList({ sections, scale }: StepListProps) {
 													: ""}
 												{token.unit ? `${token.unit} ` : ""}
 												{token.name}
+												{token.preparation ? ` (${token.preparation})` : ""}
 											</span>
 										);
 									case "timer":

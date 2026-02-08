@@ -35,6 +35,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 					name: string;
 					amount: string;
 					unit: string;
+					preparation: string;
 				}> = [];
 
 				for (const step of section.steps) {
@@ -44,6 +45,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 								name: token.name,
 								amount: token.amount,
 								unit: token.unit,
+								preparation: token.preparation,
 							});
 						}
 					}
@@ -68,6 +70,12 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 										<span className="ingredient-unit">{ing.unit}</span>
 									)}{" "}
 									<span className="ingredient-name">{ing.name}</span>
+									{ing.preparation && (
+										<span className="ingredient-preparation">
+											{" "}
+											({ing.preparation})
+										</span>
+									)}
 								</li>
 							))}
 						</ul>

@@ -130,6 +130,25 @@ describe("aggregateIngredients", () => {
 		expect(result[2].name).toBe("Zwiebel");
 	});
 
+	it("preserves preparation in aggregated entries", () => {
+		const input = [
+			{
+				recipeName: "Chili",
+				ingredients: [
+					{
+						type: "ingredient" as const,
+						name: "Zwiebel",
+						amount: "1",
+						unit: "Stück",
+						preparation: "fein gewürfelt",
+					},
+				],
+			},
+		];
+		const result = aggregateIngredients(input);
+		expect(result[0].entries[0].preparation).toBe("fein gewürfelt");
+	});
+
 	it("returns empty array for empty input", () => {
 		const result = aggregateIngredients([]);
 		expect(result).toEqual([]);

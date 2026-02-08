@@ -8,6 +8,7 @@ export interface RecipeIngredients {
 export interface AggregatedEntry {
 	amount: string;
 	unit: string;
+	preparation: string;
 	recipeName: string;
 }
 
@@ -30,6 +31,7 @@ export function aggregateIngredients(
 				existing.entries.push({
 					amount: ingredient.amount,
 					unit: ingredient.unit,
+					preparation: ingredient.preparation,
 					recipeName: recipe.recipeName,
 				});
 			} else {
@@ -39,6 +41,7 @@ export function aggregateIngredients(
 						{
 							amount: ingredient.amount,
 							unit: ingredient.unit,
+							preparation: ingredient.preparation,
 							recipeName: recipe.recipeName,
 						},
 					],
