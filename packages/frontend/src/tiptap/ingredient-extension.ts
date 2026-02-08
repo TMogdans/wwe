@@ -9,6 +9,7 @@ declare module "@tiptap/core" {
 				name: string;
 				amount: string;
 				unit: string;
+				preparation: string;
 			}) => ReturnType;
 		};
 	}
@@ -25,6 +26,7 @@ export const IngredientExtension = Node.create({
 			name: { default: "" },
 			amount: { default: "" },
 			unit: { default: "" },
+			preparation: { default: "" },
 		};
 	},
 
@@ -49,7 +51,12 @@ export const IngredientExtension = Node.create({
 	addCommands() {
 		return {
 			insertIngredient:
-				(attrs: { name: string; amount: string; unit: string }) =>
+				(attrs: {
+					name: string;
+					amount: string;
+					unit: string;
+					preparation: string;
+				}) =>
 				({ commands }) => {
 					return commands.insertContent({
 						type: this.name,

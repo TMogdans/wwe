@@ -17,7 +17,13 @@ export interface RecipeDetail {
 		steps: Array<{
 			tokens: Array<
 				| { type: "text"; value: string }
-				| { type: "ingredient"; name: string; amount: string; unit: string }
+				| {
+						type: "ingredient";
+						name: string;
+						amount: string;
+						unit: string;
+						preparation: string;
+				  }
 				| { type: "timer"; name: string; duration: string; unit: string }
 				| { type: "equipment"; name: string }
 				| { type: "inlineComment"; value: string }

@@ -9,7 +9,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 		editor
 			?.chain()
 			.focus()
-			.insertIngredient({ name: "", amount: "", unit: "" })
+			.insertIngredient({ name: "", amount: "", unit: "", preparation: "" })
 			.run();
 	}
 

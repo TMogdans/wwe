@@ -3,16 +3,25 @@ import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import { useState } from "react";
 
 export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
-	const { name, amount, unit } = node.attrs;
+	const { name, amount, unit, preparation } = node.attrs;
 	const [open, setOpen] = useState(false);
 	const [editName, setEditName] = useState(name as string);
 	const [editAmount, setEditAmount] = useState(amount as string);
 	const [editUnit, setEditUnit] = useState(unit as string);
+	const [editPreparation, setEditPreparation] = useState(preparation as string);
 
 	const displayText = [amount, unit, name].filter(Boolean).join(" ");
+	const displayWithPrep = preparation
+		? `${displayText} (${preparation})`
+		: displayText;
 
 	const handleSave = () => {
-		updateAttributes({ name: editName, amount: editAmount, unit: editUnit });
+		updateAttributes({
+			name: editName,
+			amount: editAmount,
+			unit: editUnit,
+			preparation: editPreparation,
+		});
 		setOpen(false);
 	};
 
@@ -21,7 +30,7 @@ export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
 			<Popover.Root open={open} onOpenChange={setOpen}>
 				<Popover.Trigger asChild>
 					<span className="ingredient-chip__label">
-						{displayText || "Zutat"}
+						{displayWithPrep || "Zutat"}
 					</span>
 				</Popover.Trigger>
 				<Popover.Portal>
@@ -49,6 +58,14 @@ export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
 									value={editUnit}
 									onChange={(e) => setEditUnit(e.target.value)}
 									placeholder="z.B. g"
+								/>
+							</label>
+							<label>
+								Zubereitung
+								<input
+									value={editPreparation}
+									onChange={(e) => setEditPreparation(e.target.value)}
+									placeholder="z.B. fein gewürfelt"
 								/>
 							</label>
 							<button type="button" onClick={handleSave}>

@@ -115,12 +115,21 @@ function parseToken(
 			const parts = braceContent.split("%");
 			const amount = parts[0] ?? "";
 			const unit = parts[1] ?? "";
+			let preparation = "";
+			let finalEnd = end;
+			if (end < text.length && text[end] === "(") {
+				const closeIdx = text.indexOf(")", end + 1);
+				if (closeIdx !== -1) {
+					preparation = text.substring(end + 1, closeIdx).trim();
+					finalEnd = closeIdx + 1;
+				}
+			}
 			return {
 				node: {
 					type: "ingredient",
-					attrs: { name, amount, unit },
+					attrs: { name, amount, unit, preparation },
 				},
-				end,
+				end: finalEnd,
 			};
 		}
 
@@ -154,7 +163,7 @@ function parseToken(
 			return {
 				node: {
 					type: "ingredient",
-					attrs: { name, amount: "", unit: "" },
+					attrs: { name, amount: "", unit: "", preparation: "" },
 				},
 				end: i,
 			};
@@ -199,10 +208,13 @@ export function tiptapDocToCooklang(doc: JSONContent): string {
 				.map((child) => {
 					if (child.type === "text") return child.text ?? "";
 					if (child.type === "ingredient") {
-						const { name, amount, unit } = child.attrs ?? {};
-						if (!amount && !unit) return `@${name}`;
-						if (unit) return `@${name}{${amount}%${unit}}`;
-						return `@${name}{${amount}}`;
+						const { name, amount, unit, preparation } = child.attrs ?? {};
+						let result: string;
+						if (!amount && !unit) result = `@${name}`;
+						else if (unit) result = `@${name}{${amount}%${unit}}`;
+						else result = `@${name}{${amount}}`;
+						if (preparation) result += `(${preparation})`;
+						return result;
 					}
 					if (child.type === "timer") {
 						const { name, duration, unit } = child.attrs ?? {};
@@ -242,7 +254,12 @@ function tokenToTiptapNode(token: Token): JSONContent {
 		case "ingredient":
 			return {
 				type: "ingredient",
-				attrs: { name: token.name, amount: token.amount, unit: token.unit },
+				attrs: {
+					name: token.name,
+					amount: token.amount,
+					unit: token.unit,
+					preparation: token.preparation,
+				},
 			};
 		case "timer":
 			return {

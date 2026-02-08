@@ -10,7 +10,12 @@ export const SlashCommands = Extension.create({
 				handler: ({ state, range, chain }) => {
 					chain()
 						.deleteRange(range)
-						.insertIngredient({ name: "", amount: "", unit: "" })
+						.insertIngredient({
+							name: "",
+							amount: "",
+							unit: "",
+							preparation: "",
+						})
 						.run();
 				},
 			}),
