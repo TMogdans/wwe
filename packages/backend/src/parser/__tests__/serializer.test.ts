@@ -67,6 +67,66 @@ describe("serializeRecipe", () => {
 		expect(output).not.toContain("{");
 	});
 
+	it("serializes ingredient with preparation note", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Zwiebel",
+									amount: "1",
+									unit: "",
+									preparation: "geschält und fein gewürfelt",
+								},
+								{ type: "text" as const, value: " anbraten." },
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@Zwiebel{1%}(geschält und fein gewürfelt) anbraten.");
+	});
+
+	it("serializes ingredient without preparation note", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Mehl",
+									amount: "500",
+									unit: "g",
+									preparation: "",
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@Mehl{500%g}");
+	});
+
+	it("roundtrips ingredient with preparation note", () => {
+		const input = "@Knoblauch{2%Zehen}(gepresst) dazugeben.";
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		expect(output).toBe("@Knoblauch{2%Zehen}(gepresst) dazugeben.");
+	});
+
 	it("serializes equipment with spaces using braces", () => {
 		const recipe = {
 			metadata: {},

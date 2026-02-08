@@ -6,10 +6,16 @@ import type { CooklangRecipe, CooklangToken } from "./types.js";
 function serializeToken(token: CooklangToken): string {
 	switch (token.type) {
 		case "ingredient": {
+			let result: string;
 			if (token.amount === "" && token.unit === "") {
-				return `@${token.name}`;
+				result = `@${token.name}`;
+			} else {
+				result = `@${token.name}{${token.amount}%${token.unit}}`;
 			}
-			return `@${token.name}{${token.amount}%${token.unit}}`;
+			if (token.preparation) {
+				result += `(${token.preparation})`;
+			}
+			return result;
 		}
 		case "equipment": {
 			if (token.name.includes(" ")) {
