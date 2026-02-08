@@ -112,7 +112,13 @@ function parseToken(
 		const end = braceEnd + 1;
 
 		if (trigger === "@") {
-			const parts = braceContent.split("%");
+			let raw = braceContent;
+			let fixed = false;
+			if (raw.startsWith("=")) {
+				fixed = true;
+				raw = raw.substring(1);
+			}
+			const parts = raw.split("%");
 			const amount = parts[0] ?? "";
 			const unit = parts[1] ?? "";
 			let preparation = "";
@@ -127,7 +133,7 @@ function parseToken(
 			return {
 				node: {
 					type: "ingredient",
-					attrs: { name, amount, unit, preparation },
+					attrs: { name, amount, unit, preparation, fixed },
 				},
 				end: finalEnd,
 			};
@@ -163,7 +169,7 @@ function parseToken(
 			return {
 				node: {
 					type: "ingredient",
-					attrs: { name, amount: "", unit: "", preparation: "" },
+					attrs: { name, amount: "", unit: "", preparation: "", fixed: false },
 				},
 				end: i,
 			};
@@ -208,11 +214,13 @@ export function tiptapDocToCooklang(doc: JSONContent): string {
 				.map((child) => {
 					if (child.type === "text") return child.text ?? "";
 					if (child.type === "ingredient") {
-						const { name, amount, unit, preparation } = child.attrs ?? {};
+						const { name, amount, unit, preparation, fixed } =
+							child.attrs ?? {};
 						let result: string;
-						if (!amount && !unit) result = `@${name}`;
-						else if (unit) result = `@${name}{${amount}%${unit}}`;
-						else result = `@${name}{${amount}}`;
+						const prefix = fixed ? "=" : "";
+						if (!amount && !unit && !fixed) result = `@${name}`;
+						else if (unit) result = `@${name}{${prefix}${amount}%${unit}}`;
+						else result = `@${name}{${prefix}${amount}}`;
 						if (preparation) result += `(${preparation})`;
 						return result;
 					}
@@ -259,6 +267,7 @@ function tokenToTiptapNode(token: Token): JSONContent {
 					amount: token.amount,
 					unit: token.unit,
 					preparation: token.preparation,
+					fixed: token.fixed ?? false,
 				},
 			};
 		case "timer":

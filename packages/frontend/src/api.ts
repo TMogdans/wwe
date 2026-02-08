@@ -23,6 +23,7 @@ export interface RecipeDetail {
 						amount: string;
 						unit: string;
 						preparation: string;
+						fixed?: boolean;
 				  }
 				| { type: "timer"; name: string; duration: string; unit: string }
 				| { type: "equipment"; name: string }

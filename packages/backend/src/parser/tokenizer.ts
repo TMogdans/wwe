@@ -34,14 +34,25 @@ function findBraceBeforeNextTrigger(line: string, start: number): number {
  * Split by `%` — left side is amount, right side is unit.
  * If no `%`, entire content is amount and unit is empty.
  */
-function parseBraceContent(content: string): { amount: string; unit: string } {
-	const percentIndex = content.indexOf("%");
+function parseBraceContent(content: string): {
+	amount: string;
+	unit: string;
+	fixed: boolean;
+} {
+	let raw = content;
+	let fixed = false;
+	if (raw.startsWith("=")) {
+		fixed = true;
+		raw = raw.substring(1);
+	}
+	const percentIndex = raw.indexOf("%");
 	if (percentIndex === -1) {
-		return { amount: content, unit: "" };
+		return { amount: raw, unit: "", fixed };
 	}
 	return {
-		amount: content.substring(0, percentIndex),
-		unit: content.substring(percentIndex + 1),
+		amount: raw.substring(0, percentIndex),
+		unit: raw.substring(percentIndex + 1),
+		fixed,
 	};
 }
 
@@ -164,18 +175,20 @@ export function tokenizeLine(line: string): TokenizeResult {
 					continue;
 				}
 				const content = line.substring(braceIndex + 1, closingBrace);
-				const { amount, unit } = parseBraceContent(content);
+				const { amount, unit, fixed } = parseBraceContent(content);
 				const { preparation, end: prepEnd } = readPreparation(
 					line,
 					closingBrace + 1,
 				);
-				tokens.push({
+				const ingredient: CooklangIngredient = {
 					type: "ingredient",
 					name,
 					amount,
 					unit,
 					preparation,
-				} as CooklangIngredient);
+				};
+				if (fixed) ingredient.fixed = true;
+				tokens.push(ingredient);
 				i = prepEnd;
 			} else {
 				// Single word name

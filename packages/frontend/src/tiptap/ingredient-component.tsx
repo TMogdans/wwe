@@ -3,12 +3,13 @@ import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import { useState } from "react";
 
 export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
-	const { name, amount, unit, preparation } = node.attrs;
+	const { name, amount, unit, preparation, fixed } = node.attrs;
 	const [open, setOpen] = useState(false);
 	const [editName, setEditName] = useState(name as string);
 	const [editAmount, setEditAmount] = useState(amount as string);
 	const [editUnit, setEditUnit] = useState(unit as string);
 	const [editPreparation, setEditPreparation] = useState(preparation as string);
+	const [editFixed, setEditFixed] = useState(fixed as boolean);
 
 	const displayText = [amount, unit, name].filter(Boolean).join(" ");
 	const displayWithPrep = preparation
@@ -21,6 +22,7 @@ export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
 			amount: editAmount,
 			unit: editUnit,
 			preparation: editPreparation,
+			fixed: editFixed,
 		});
 		setOpen(false);
 	};
@@ -29,7 +31,10 @@ export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
 		<NodeViewWrapper as="span" className="ingredient-chip">
 			<Popover.Root open={open} onOpenChange={setOpen}>
 				<Popover.Trigger asChild>
-					<span className="ingredient-chip__label">
+					<span
+						className={`ingredient-chip__label${fixed ? " ingredient-chip__label--fixed" : ""}`}
+					>
+						{fixed ? "🔒 " : ""}
 						{displayWithPrep || "Zutat"}
 					</span>
 				</Popover.Trigger>
@@ -67,6 +72,14 @@ export function IngredientComponent({ node, updateAttributes }: NodeViewProps) {
 									onChange={(e) => setEditPreparation(e.target.value)}
 									placeholder="z.B. fein gewürfelt"
 								/>
+							</label>
+							<label className="popover-form__checkbox">
+								<input
+									type="checkbox"
+									checked={editFixed}
+									onChange={(e) => setEditFixed(e.target.checked)}
+								/>
+								Fixe Menge (nicht skalieren)
 							</label>
 							<button type="button" onClick={handleSave}>
 								Speichern

@@ -13,6 +13,10 @@
 	white-space: nowrap;
 }
 
+.ingredient-chip__label--fixed {
+	border: 1px dashed var(--color-ingredient);
+}
+
 .ingredient-chip__label:hover {
 	background: color-mix(in srgb, var(--color-ingredient) 25%, transparent);
 }
@@ -103,12 +107,18 @@
 	font-weight: 500;
 }
 
-.popover-form input {
+.popover-form input:not([type="checkbox"]) {
 	padding: 0.5rem;
 	border: 1px solid var(--color-border);
 	border-radius: 4px;
 	font-size: 0.875rem;
 	font-family: inherit;
+}
+
+.popover-form__checkbox {
+	flex-direction: row !important;
+	align-items: center;
+	gap: 0.5rem !important;
 }
 
 .popover-form button {

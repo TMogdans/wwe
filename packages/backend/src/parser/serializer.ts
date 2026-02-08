@@ -7,10 +7,11 @@ function serializeToken(token: CooklangToken): string {
 	switch (token.type) {
 		case "ingredient": {
 			let result: string;
-			if (token.amount === "" && token.unit === "") {
+			if (token.amount === "" && token.unit === "" && !token.fixed) {
 				result = `@${token.name}`;
 			} else {
-				result = `@${token.name}{${token.amount}%${token.unit}}`;
+				const prefix = token.fixed ? "=" : "";
+				result = `@${token.name}{${prefix}${token.amount}%${token.unit}}`;
 			}
 			if (token.preparation) {
 				result += `(${token.preparation})`;

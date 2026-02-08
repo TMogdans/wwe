@@ -161,6 +161,67 @@ describe("tokenizeLine", () => {
 		]);
 	});
 
+	// --- Fixed amounts ---
+
+	it("parses ingredient with fixed amount", () => {
+		const { tokens } = tokenizeLine("@Salz{=1%TL} hinzufügen.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Salz",
+				amount: "1",
+				unit: "TL",
+				preparation: "",
+				fixed: true,
+			},
+			{ type: "text", value: " hinzufügen." },
+		]);
+	});
+
+	it("parses ingredient with fixed amount without unit", () => {
+		const { tokens } = tokenizeLine("@Lorbeerblatt{=2} dazugeben.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Lorbeerblatt",
+				amount: "2",
+				unit: "",
+				preparation: "",
+				fixed: true,
+			},
+			{ type: "text", value: " dazugeben." },
+		]);
+	});
+
+	it("parses ingredient with fixed amount and preparation", () => {
+		const { tokens } = tokenizeLine("@Vanilleextrakt{=1%TL}(pur) einrühren.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Vanilleextrakt",
+				amount: "1",
+				unit: "TL",
+				preparation: "pur",
+				fixed: true,
+			},
+			{ type: "text", value: " einrühren." },
+		]);
+	});
+
+	it("does not set fixed for normal amount", () => {
+		const { tokens } = tokenizeLine("@Mehl{500%g} sieben.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Mehl",
+				amount: "500",
+				unit: "g",
+				preparation: "",
+			},
+			{ type: "text", value: " sieben." },
+		]);
+	});
+
 	it("parses equipment", () => {
 		const { tokens } = tokenizeLine("In einem #Topf erhitzen.");
 		expect(tokens).toEqual([

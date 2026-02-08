@@ -8,6 +8,7 @@ export interface CooklangIngredient {
 	amount: string;
 	unit: string;
 	preparation: string;
+	fixed?: boolean;
 }
 
 export interface CooklangTimer {

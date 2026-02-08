@@ -127,6 +127,66 @@ describe("serializeRecipe", () => {
 		expect(output).toBe("@Knoblauch{2%Zehen}(gepresst) dazugeben.");
 	});
 
+	it("serializes fixed ingredient with = prefix", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Salz",
+									amount: "1",
+									unit: "TL",
+									preparation: "",
+									fixed: true,
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@Salz{=1%TL}");
+	});
+
+	it("serializes non-fixed ingredient without = prefix", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Mehl",
+									amount: "500",
+									unit: "g",
+									preparation: "",
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@Mehl{500%g}");
+	});
+
+	it("roundtrips fixed ingredient", () => {
+		const input = "@Vanilleextrakt{=1%TL} hinzufügen.";
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		expect(output).toBe("@Vanilleextrakt{=1%TL} hinzufügen.");
+	});
+
 	it("serializes equipment with spaces using braces", () => {
 		const recipe = {
 			metadata: {},
