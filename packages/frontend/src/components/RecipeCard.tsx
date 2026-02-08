@@ -1,11 +1,7 @@
 interface RecipeCardProps {
 	slug: string;
 	name: string;
-	metadata: {
-		"time required"?: string;
-		course?: string;
-		servings?: string;
-	};
+	metadata: Record<string, string>;
 	selected: boolean;
 	onToggleSelect: () => void;
 }
@@ -39,6 +35,8 @@ export function RecipeCard({
 				)}
 				{metadata.course && <span>Gang: {metadata.course}</span>}
 				{metadata.servings && <span>Portionen: {metadata.servings}</span>}
+				{metadata.difficulty && <span>{metadata.difficulty}</span>}
+				{metadata.cuisine && <span>{metadata.cuisine}</span>}
 			</div>
 		</a>
 	);
