@@ -200,7 +200,13 @@ Ende -] Weiter hier.`;
 		expect(recipe.sections[0].steps[0].isNote).toBe(true);
 		expect(recipe.sections[0].steps[0].tokens).toEqual([
 			{ type: "text", value: "Tipp: " },
-			{ type: "ingredient", name: "Butter", amount: "50", unit: "g" },
+			{
+				type: "ingredient",
+				name: "Butter",
+				amount: "50",
+				unit: "g",
+				preparation: "",
+			},
 			{ type: "text", value: " vorher schmelzen." },
 		]);
 	});

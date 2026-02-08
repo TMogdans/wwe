@@ -46,6 +46,26 @@ function parseBraceContent(content: string): { amount: string; unit: string } {
 }
 
 /**
+ * Check if a `(` immediately follows the current position and read the
+ * preparation note content until the matching `)`.
+ * Returns the preparation string and the index after `)`, or empty string
+ * and unchanged index if no `(` is present.
+ */
+function readPreparation(
+	line: string,
+	pos: number,
+): { preparation: string; end: number } {
+	if (pos < line.length && line[pos] === "(") {
+		const closeIdx = line.indexOf(")", pos + 1);
+		if (closeIdx !== -1) {
+			const preparation = line.substring(pos + 1, closeIdx).trim();
+			return { preparation, end: closeIdx + 1 };
+		}
+	}
+	return { preparation: "", end: pos };
+}
+
+/**
  * Read a single-word name starting at `start`. The word is terminated by
  * space, comma, period, or end of line.
  * Returns the name and the index of the character after the name.
@@ -145,13 +165,18 @@ export function tokenizeLine(line: string): TokenizeResult {
 				}
 				const content = line.substring(braceIndex + 1, closingBrace);
 				const { amount, unit } = parseBraceContent(content);
+				const { preparation, end: prepEnd } = readPreparation(
+					line,
+					closingBrace + 1,
+				);
 				tokens.push({
 					type: "ingredient",
 					name,
 					amount,
 					unit,
+					preparation,
 				} as CooklangIngredient);
-				i = closingBrace + 1;
+				i = prepEnd;
 			} else {
 				// Single word name
 				const { name, end } = readSingleWordName(line, i);
@@ -160,6 +185,7 @@ export function tokenizeLine(line: string): TokenizeResult {
 					name,
 					amount: "",
 					unit: "",
+					preparation: "",
 				} as CooklangIngredient);
 				i = end;
 			}

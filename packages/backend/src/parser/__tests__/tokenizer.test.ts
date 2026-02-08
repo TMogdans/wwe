@@ -11,7 +11,13 @@ describe("tokenizeLine", () => {
 		const { tokens } = tokenizeLine("Das @Hackfleisch{500%g} anbraten.");
 		expect(tokens).toEqual([
 			{ type: "text", value: "Das " },
-			{ type: "ingredient", name: "Hackfleisch", amount: "500", unit: "g" },
+			{
+				type: "ingredient",
+				name: "Hackfleisch",
+				amount: "500",
+				unit: "g",
+				preparation: "",
+			},
 			{ type: "text", value: " anbraten." },
 		]);
 	});
@@ -24,6 +30,7 @@ describe("tokenizeLine", () => {
 				name: "Passierte Tomaten",
 				amount: "400g",
 				unit: "",
+				preparation: "",
 			},
 			{ type: "text", value: " hinzufuegen." },
 		]);
@@ -33,9 +40,21 @@ describe("tokenizeLine", () => {
 		const { tokens } = tokenizeLine("Mit @Salz und @Pfeffer wuerzen.");
 		expect(tokens).toEqual([
 			{ type: "text", value: "Mit " },
-			{ type: "ingredient", name: "Salz", amount: "", unit: "" },
+			{
+				type: "ingredient",
+				name: "Salz",
+				amount: "",
+				unit: "",
+				preparation: "",
+			},
 			{ type: "text", value: " und " },
-			{ type: "ingredient", name: "Pfeffer", amount: "", unit: "" },
+			{
+				type: "ingredient",
+				name: "Pfeffer",
+				amount: "",
+				unit: "",
+				preparation: "",
+			},
 			{ type: "text", value: " wuerzen." },
 		]);
 	});
@@ -43,7 +62,13 @@ describe("tokenizeLine", () => {
 	it("parses ingredient with fraction amount", () => {
 		const { tokens } = tokenizeLine("@Vanilleschote{1/2} auskratzen.");
 		expect(tokens).toEqual([
-			{ type: "ingredient", name: "Vanilleschote", amount: "1/2", unit: "" },
+			{
+				type: "ingredient",
+				name: "Vanilleschote",
+				amount: "1/2",
+				unit: "",
+				preparation: "",
+			},
 			{ type: "text", value: " auskratzen." },
 		]);
 	});
@@ -51,8 +76,88 @@ describe("tokenizeLine", () => {
 	it("parses ingredient with comma in name", () => {
 		const { tokens } = tokenizeLine("@Chili, grün{1%Stück} hacken.");
 		expect(tokens).toEqual([
-			{ type: "ingredient", name: "Chili, grün", amount: "1", unit: "Stück" },
+			{
+				type: "ingredient",
+				name: "Chili, grün",
+				amount: "1",
+				unit: "Stück",
+				preparation: "",
+			},
 			{ type: "text", value: " hacken." },
+		]);
+	});
+
+	// --- Preparation notes ---
+
+	it("parses ingredient with preparation note", () => {
+		const { tokens } = tokenizeLine(
+			"@Zwiebel{1}(geschält und fein gewürfelt) anbraten.",
+		);
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Zwiebel",
+				amount: "1",
+				unit: "",
+				preparation: "geschält und fein gewürfelt",
+			},
+			{ type: "text", value: " anbraten." },
+		]);
+	});
+
+	it("parses ingredient with preparation note and unit", () => {
+		const { tokens } = tokenizeLine("@Knoblauch{2%Zehen}(gepresst) dazu.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Knoblauch",
+				amount: "2",
+				unit: "Zehen",
+				preparation: "gepresst",
+			},
+			{ type: "text", value: " dazu." },
+		]);
+	});
+
+	it("parses ingredient without preparation note (no parens)", () => {
+		const { tokens } = tokenizeLine("@Hackfleisch{500%g} anbraten.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Hackfleisch",
+				amount: "500",
+				unit: "g",
+				preparation: "",
+			},
+			{ type: "text", value: " anbraten." },
+		]);
+	});
+
+	it("parses ingredient with empty preparation note", () => {
+		const { tokens } = tokenizeLine("@Mehl{200%g}() einrühren.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Mehl",
+				amount: "200",
+				unit: "g",
+				preparation: "",
+			},
+			{ type: "text", value: " einrühren." },
+		]);
+	});
+
+	it("does not parse parentheses with space after brace as preparation", () => {
+		const { tokens } = tokenizeLine("@Mehl{200%g} (optional) einrühren.");
+		expect(tokens).toEqual([
+			{
+				type: "ingredient",
+				name: "Mehl",
+				amount: "200",
+				unit: "g",
+				preparation: "",
+			},
+			{ type: "text", value: " (optional) einrühren." },
 		]);
 	});
 
@@ -103,11 +208,23 @@ describe("tokenizeLine", () => {
 			"@Öl{2%EL} in einem #Topf erhitzen und @Hackfleisch{500%g} anbraten.",
 		);
 		expect(tokens).toEqual([
-			{ type: "ingredient", name: "Öl", amount: "2", unit: "EL" },
+			{
+				type: "ingredient",
+				name: "Öl",
+				amount: "2",
+				unit: "EL",
+				preparation: "",
+			},
 			{ type: "text", value: " in einem " },
 			{ type: "equipment", name: "Topf" },
 			{ type: "text", value: " erhitzen und " },
-			{ type: "ingredient", name: "Hackfleisch", amount: "500", unit: "g" },
+			{
+				type: "ingredient",
+				name: "Hackfleisch",
+				amount: "500",
+				unit: "g",
+				preparation: "",
+			},
 			{ type: "text", value: " anbraten." },
 		]);
 	});
@@ -127,7 +244,13 @@ describe("tokenizeLine", () => {
 			"@Öl{2%EL} erhitzen -- auf mittlerer Hitze",
 		);
 		expect(tokens).toEqual([
-			{ type: "ingredient", name: "Öl", amount: "2", unit: "EL" },
+			{
+				type: "ingredient",
+				name: "Öl",
+				amount: "2",
+				unit: "EL",
+				preparation: "",
+			},
 			{ type: "text", value: " erhitzen " },
 			{ type: "inlineComment", value: "auf mittlerer Hitze" },
 		]);
@@ -179,7 +302,13 @@ describe("tokenizeLine", () => {
 			"@Öl{2%EL} [- alternativ Butter -] in #Topf erhitzen",
 		);
 		expect(tokens).toEqual([
-			{ type: "ingredient", name: "Öl", amount: "2", unit: "EL" },
+			{
+				type: "ingredient",
+				name: "Öl",
+				amount: "2",
+				unit: "EL",
+				preparation: "",
+			},
 			{ type: "text", value: " " },
 			{ type: "blockComment", value: "alternativ Butter" },
 			{ type: "text", value: " in " },

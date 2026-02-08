@@ -7,6 +7,7 @@ export interface CooklangIngredient {
 	name: string;
 	amount: string;
 	unit: string;
+	preparation: string;
 }
 
 export interface CooklangTimer {
