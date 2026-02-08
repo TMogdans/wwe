@@ -92,7 +92,7 @@ export async function fetchCourses(): Promise<string[]> {
 }
 
 export async function generateShoppingList(
-	slugs: string[],
+	slugs: Array<string | { slug: string; servings?: number }>,
 ): Promise<AggregatedIngredient[]> {
 	const res = await fetch("/api/einkaufsliste", {
 		method: "POST",
