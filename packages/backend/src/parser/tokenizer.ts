@@ -1,6 +1,8 @@
 import type {
+	CooklangBlockComment,
 	CooklangEquipment,
 	CooklangIngredient,
+	CooklangInlineComment,
 	CooklangText,
 	CooklangTimer,
 	CooklangToken,
@@ -63,13 +65,24 @@ function readSingleWordName(
 	return { name: line.substring(start, end), end };
 }
 
+export interface TokenizeResult {
+	tokens: CooklangToken[];
+	openBlockComment?: string;
+}
+
 /**
  * Tokenize a single line of Cooklang text into an array of tokens.
+ *
+ * Supports inline comments (`-- text`) and single-line block comments
+ * (`[- text -]`). If a block comment opens (`[-`) but does not close on
+ * the same line, the unclosed content is returned via `openBlockComment`
+ * so the parser can accumulate across lines.
  */
-export function tokenizeLine(line: string): CooklangToken[] {
+export function tokenizeLine(line: string): TokenizeResult {
 	const tokens: CooklangToken[] = [];
 	let textAccumulator = "";
 	let i = 0;
+	let openBlockComment: string | undefined;
 
 	function flushText(): void {
 		if (textAccumulator.length > 0) {
@@ -80,6 +93,38 @@ export function tokenizeLine(line: string): CooklangToken[] {
 
 	while (i < line.length) {
 		const ch = line[i];
+
+		// Block comment start: [-
+		if (ch === "[" && i + 1 < line.length && line[i + 1] === "-") {
+			flushText();
+			const closeIdx = line.indexOf("-]", i + 2);
+			if (closeIdx !== -1) {
+				// Closed block comment on same line
+				const value = line.substring(i + 2, closeIdx).trim();
+				tokens.push({
+					type: "blockComment",
+					value,
+				} as CooklangBlockComment);
+				i = closeIdx + 2;
+				continue;
+			}
+			// Unclosed block comment — signal to parser
+			openBlockComment = line.substring(i + 2);
+			i = line.length;
+			continue;
+		}
+
+		// Inline comment: --
+		if (ch === "-" && i + 1 < line.length && line[i + 1] === "-") {
+			flushText();
+			const value = line.substring(i + 2).trim();
+			tokens.push({
+				type: "inlineComment",
+				value,
+			} as CooklangInlineComment);
+			i = line.length;
+			continue;
+		}
 
 		if (ch === "@") {
 			flushText();
@@ -180,5 +225,5 @@ export function tokenizeLine(line: string): CooklangToken[] {
 	}
 
 	flushText();
-	return tokens;
+	return { tokens, openBlockComment };
 }
