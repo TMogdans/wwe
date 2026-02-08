@@ -98,15 +98,15 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 						currentServings={servings}
 						onChange={setServings}
 					/>
-					<IngredientList steps={recipe.steps} scale={scale} />
+					<IngredientList sections={recipe.sections} scale={scale} />
 				</Tabs.Content>
 
 				<Tabs.Content value="equipment">
-					<EquipmentList steps={recipe.steps} />
+					<EquipmentList sections={recipe.sections} />
 				</Tabs.Content>
 
 				<Tabs.Content value="zubereitung">
-					<StepList steps={recipe.steps} scale={scale} />
+					<StepList sections={recipe.sections} scale={scale} />
 				</Tabs.Content>
 			</Tabs.Root>
 

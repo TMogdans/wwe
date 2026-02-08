@@ -1,7 +1,7 @@
 import type { RecipeDetail } from "../api.js";
 
 interface IngredientListProps {
-	steps: RecipeDetail["steps"];
+	sections: RecipeDetail["sections"];
 	scale: number;
 }
 
@@ -25,38 +25,55 @@ function scaleAmount(amount: string, scale: number): string {
 	return amount;
 }
 
-export function IngredientList({ steps, scale }: IngredientListProps) {
-	const ingredients: Array<{
-		name: string;
-		amount: string;
-		unit: string;
-	}> = [];
-
-	for (const step of steps) {
-		for (const token of step.tokens) {
-			if (token.type === "ingredient") {
-				ingredients.push({
-					name: token.name,
-					amount: token.amount,
-					unit: token.unit,
-				});
-			}
-		}
-	}
+export function IngredientList({ sections, scale }: IngredientListProps) {
+	const hasMultipleSections = sections.filter((s) => s.name).length > 1;
 
 	return (
 		<ul className="ingredient-list">
-			{ingredients.map((ing, i) => (
-				<li key={`${ing.name}-${i}`} className="ingredient-item">
-					{ing.amount && (
-						<span className="ingredient-amount">
-							{scaleAmount(ing.amount, scale)}
-						</span>
-					)}{" "}
-					{ing.unit && <span className="ingredient-unit">{ing.unit}</span>}{" "}
-					<span className="ingredient-name">{ing.name}</span>
-				</li>
-			))}
+			{sections.map((section) => {
+				const ingredients: Array<{
+					name: string;
+					amount: string;
+					unit: string;
+				}> = [];
+
+				for (const step of section.steps) {
+					for (const token of step.tokens) {
+						if (token.type === "ingredient") {
+							ingredients.push({
+								name: token.name,
+								amount: token.amount,
+								unit: token.unit,
+							});
+						}
+					}
+				}
+
+				if (ingredients.length === 0) return null;
+
+				return (
+					<li key={section.name || "__default"} style={{ listStyle: "none" }}>
+						{hasMultipleSections && section.name && (
+							<strong>{section.name}</strong>
+						)}
+						<ul>
+							{ingredients.map((ing, i) => (
+								<li key={`${ing.name}-${i}`} className="ingredient-item">
+									{ing.amount && (
+										<span className="ingredient-amount">
+											{scaleAmount(ing.amount, scale)}
+										</span>
+									)}{" "}
+									{ing.unit && (
+										<span className="ingredient-unit">{ing.unit}</span>
+									)}{" "}
+									<span className="ingredient-name">{ing.name}</span>
+								</li>
+							))}
+						</ul>
+					</li>
+				);
+			})}
 		</ul>
 	);
 }

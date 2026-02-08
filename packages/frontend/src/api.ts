@@ -12,13 +12,18 @@ export interface RecipeDetail {
 	slug: string;
 	name: string;
 	metadata: Record<string, string>;
-	steps: Array<{
-		tokens: Array<
-			| { type: "text"; value: string }
-			| { type: "ingredient"; name: string; amount: string; unit: string }
-			| { type: "timer"; name: string; duration: string; unit: string }
-			| { type: "equipment"; name: string }
-		>;
+	sections: Array<{
+		name: string;
+		steps: Array<{
+			tokens: Array<
+				| { type: "text"; value: string }
+				| { type: "ingredient"; name: string; amount: string; unit: string }
+				| { type: "timer"; name: string; duration: string; unit: string }
+				| { type: "equipment"; name: string }
+				| { type: "inlineComment"; value: string }
+				| { type: "blockComment"; value: string }
+			>;
+		}>;
 	}>;
 }
 

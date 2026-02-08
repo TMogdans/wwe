@@ -26,17 +26,34 @@ export interface CooklangText {
 	value: string;
 }
 
+export interface CooklangInlineComment {
+	type: "inlineComment";
+	value: string;
+}
+
+export interface CooklangBlockComment {
+	type: "blockComment";
+	value: string;
+}
+
 export type CooklangToken =
 	| CooklangIngredient
 	| CooklangTimer
 	| CooklangEquipment
-	| CooklangText;
+	| CooklangText
+	| CooklangInlineComment
+	| CooklangBlockComment;
 
 export interface CooklangStep {
 	tokens: CooklangToken[];
 }
 
+export interface CooklangSection {
+	name: string;
+	steps: CooklangStep[];
+}
+
 export interface CooklangRecipe {
 	metadata: CooklangMetadata;
-	steps: CooklangStep[];
+	sections: CooklangSection[];
 }

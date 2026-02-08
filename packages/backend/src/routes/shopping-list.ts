@@ -63,10 +63,12 @@ export function createShoppingListRouter(recipesDir: string): Router {
 			const parsed = parseRecipe(content);
 
 			const ingredients: CooklangIngredient[] = [];
-			for (const step of parsed.steps) {
-				for (const token of step.tokens) {
-					if (token.type === "ingredient") {
-						ingredients.push(token);
+			for (const section of parsed.sections) {
+				for (const step of section.steps) {
+					for (const token of step.tokens) {
+						if (token.type === "ingredient") {
+							ingredients.push(token);
+						}
 					}
 				}
 			}

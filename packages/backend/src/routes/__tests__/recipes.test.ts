@@ -44,8 +44,8 @@ describe("recipe routes", () => {
 		const res = await request(app).get("/api/rezepte/Chili%20con%20Carne");
 		expect(res.status).toBe(200);
 		expect(res.body.name).toBe("Chili con Carne");
-		expect(res.body.steps).toBeDefined();
-		expect(res.body.steps.length).toBeGreaterThan(0);
+		expect(res.body.sections).toBeDefined();
+		expect(res.body.sections.length).toBeGreaterThan(0);
 	});
 
 	it("GET /:slug returns 404 for non-existent recipe", async () => {

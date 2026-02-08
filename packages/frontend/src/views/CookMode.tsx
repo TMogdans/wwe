@@ -7,7 +7,28 @@ interface CookModeProps {
 	portionen?: number;
 }
 
-type Token = RecipeDetail["steps"][number]["tokens"][number];
+type Token =
+	RecipeDetail["sections"][number]["steps"][number]["tokens"][number];
+
+type CookStep = {
+	sectionName: string;
+	tokens: RecipeDetail["sections"][number]["steps"][number]["tokens"];
+	isFirstInSection: boolean;
+};
+
+function flattenSections(sections: RecipeDetail["sections"]): CookStep[] {
+	const result: CookStep[] = [];
+	for (const section of sections) {
+		for (let i = 0; i < section.steps.length; i++) {
+			result.push({
+				sectionName: section.name,
+				tokens: section.steps[i].tokens,
+				isFirstInSection: i === 0 && section.name !== "",
+			});
+		}
+	}
+	return result;
+}
 
 const SWIPE_THRESHOLD = 50;
 const MAX_FONT_SIZE = 32;
@@ -119,7 +140,8 @@ export function CookMode({ slug, portionen }: CookModeProps) {
 			.catch(() => setError("Rezept konnte nicht geladen werden."));
 	}, [slug]);
 
-	const totalSteps = recipe?.steps.length ?? 0;
+	const flatSteps = recipe ? flattenSections(recipe.sections) : [];
+	const totalSteps = flatSteps.length;
 	const isFirstStep = currentStep === 0;
 	const isLastStep = currentStep === totalSteps - 1;
 
@@ -186,7 +208,7 @@ export function CookMode({ slug, portionen }: CookModeProps) {
 
 	const progressPercent =
 		totalSteps > 1 ? ((currentStep + 1) / totalSteps) * 100 : 100;
-	const step = recipe.steps[currentStep];
+	const step = flatSteps[currentStep];
 
 	return (
 		<div
@@ -196,7 +218,9 @@ export function CookMode({ slug, portionen }: CookModeProps) {
 		>
 			<div className="cook-mode__header">
 				<span>
-					Schritt {currentStep + 1} von {totalSteps} &ndash; {recipe.name}
+					Schritt {currentStep + 1} von {totalSteps} &ndash;{" "}
+					{step.sectionName ? `${step.sectionName} \u2013 ` : ""}
+					{recipe.name}
 				</span>
 				<a href={backUrl} className="cook-mode__close">
 					&times;

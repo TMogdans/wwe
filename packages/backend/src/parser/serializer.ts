@@ -26,6 +26,12 @@ function serializeToken(token: CooklangToken): string {
 		case "text": {
 			return token.value;
 		}
+		case "inlineComment": {
+			return `-- ${token.value}`;
+		}
+		case "blockComment": {
+			return `[- ${token.value} -]`;
+		}
 	}
 }
 
@@ -33,9 +39,9 @@ function serializeToken(token: CooklangToken): string {
  * Serialize a structured recipe object back to Cooklang format.
  *
  * - Metadata: `>> key: value` per line
- * - Empty line after metadata (if there are steps)
- * - Per step: build text from tokens
- * - Steps separated by empty lines
+ * - Empty line after metadata (if there are sections)
+ * - Per section: optional `= name` header, then steps
+ * - Sections and steps separated by empty lines
  */
 export function serializeRecipe(recipe: CooklangRecipe): string {
 	const parts: string[] = [];
@@ -46,15 +52,34 @@ export function serializeRecipe(recipe: CooklangRecipe): string {
 		parts.push(`>> ${key}: ${recipe.metadata[key]}`);
 	}
 
-	// Blank line between metadata and steps
-	if (metadataKeys.length > 0 && recipe.steps.length > 0) {
+	// Blank line between metadata and sections
+	if (metadataKeys.length > 0 && recipe.sections.length > 0) {
 		parts.push("");
 	}
 
-	// Serialize steps (one per line)
-	for (const step of recipe.steps) {
-		const stepText = step.tokens.map(serializeToken).join("");
-		parts.push(stepText);
+	// Serialize sections
+	for (let i = 0; i < recipe.sections.length; i++) {
+		const section = recipe.sections[i];
+
+		// Add blank line between sections (not before the first one)
+		if (i > 0) {
+			parts.push("");
+		}
+
+		// Emit section header for named sections
+		if (section.name !== "") {
+			parts.push(`= ${section.name}`);
+			if (section.steps.length > 0) {
+				parts.push("");
+			}
+		}
+
+		// Serialize steps within the section
+		for (let j = 0; j < section.steps.length; j++) {
+			const step = section.steps[j];
+			const stepText = step.tokens.map(serializeToken).join("");
+			parts.push(stepText);
+		}
 	}
 
 	return parts.join("\n");

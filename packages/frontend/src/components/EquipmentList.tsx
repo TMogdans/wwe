@@ -1,18 +1,20 @@
 import type { RecipeDetail } from "../api.js";
 
 interface EquipmentListProps {
-	steps: RecipeDetail["steps"];
+	sections: RecipeDetail["sections"];
 }
 
-export function EquipmentList({ steps }: EquipmentListProps) {
+export function EquipmentList({ sections }: EquipmentListProps) {
 	const seen = new Set<string>();
 	const equipment: string[] = [];
 
-	for (const step of steps) {
-		for (const token of step.tokens) {
-			if (token.type === "equipment" && !seen.has(token.name)) {
-				seen.add(token.name);
-				equipment.push(token.name);
+	for (const section of sections) {
+		for (const step of section.steps) {
+			for (const token of step.tokens) {
+				if (token.type === "equipment" && !seen.has(token.name)) {
+					seen.add(token.name);
+					equipment.push(token.name);
+				}
 			}
 		}
 	}

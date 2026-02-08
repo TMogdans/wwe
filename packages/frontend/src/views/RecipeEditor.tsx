@@ -18,9 +18,10 @@ import "../styles/editor.css";
 import "../styles/tiptap.css";
 import {
 	buildCooklangFile,
-	stepsToTiptapDoc,
+	sectionsToTiptapDoc,
 } from "../tiptap/cooklang-bridge.js";
 import {
+	CommentExtension,
 	EquipmentExtension,
 	IngredientExtension,
 	SlashCommands,
@@ -77,6 +78,7 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 				IngredientExtension,
 				TimerExtension,
 				EquipmentExtension,
+				CommentExtension,
 				SlashCommands,
 			],
 			content: initialDoc ?? EMPTY_DOC,
@@ -97,7 +99,7 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 			.then((recipe) => {
 				setRecipeName(recipe.name);
 				setMetadata(metadataFromRecipe(recipe));
-				const doc = stepsToTiptapDoc(recipe.steps);
+				const doc = sectionsToTiptapDoc(recipe.sections);
 				setInitialDoc(doc);
 			})
 			.catch(() => setError("Rezept konnte nicht geladen werden."))

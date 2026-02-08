@@ -1,7 +1,7 @@
 import type { RecipeDetail } from "../api.js";
 
 interface StepListProps {
-	steps: RecipeDetail["steps"];
+	sections: RecipeDetail["sections"];
 	scale: number;
 }
 
@@ -22,7 +22,7 @@ function scaleAmount(amount: string, scale: number): string {
 }
 
 function tokenKey(
-	token: RecipeDetail["steps"][number]["tokens"][number],
+	token: RecipeDetail["sections"][number]["steps"][number]["tokens"][number],
 	index: number,
 ): string {
 	switch (token.type) {
@@ -39,7 +39,10 @@ function tokenKey(
 	}
 }
 
-function stepKey(step: RecipeDetail["steps"][number], index: number): string {
+function stepKey(
+	step: RecipeDetail["sections"][number]["steps"][number],
+	index: number,
+): string {
 	const firstToken = step.tokens[0];
 	if (!firstToken) return `step-${index}`;
 	if (firstToken.type === "text") {
@@ -48,41 +51,52 @@ function stepKey(step: RecipeDetail["steps"][number], index: number): string {
 	return `step-${index}-${firstToken.type}`;
 }
 
-export function StepList({ steps, scale }: StepListProps) {
+export function StepList({ sections, scale }: StepListProps) {
+	const hasNamedSections = sections.some((s) => s.name);
+
 	return (
 		<div className="step-list">
-			{steps.map((step, stepIndex) => (
-				<p key={stepKey(step, stepIndex)} className="step-paragraph">
-					{step.tokens.map((token, tokenIndex) => {
-						const key = tokenKey(token, tokenIndex);
-						switch (token.type) {
-							case "text":
-								return <span key={key}>{token.value}</span>;
-							case "ingredient":
-								return (
-									<span key={key} className="token-ingredient">
-										{token.amount ? `${scaleAmount(token.amount, scale)} ` : ""}
-										{token.unit ? `${token.unit} ` : ""}
-										{token.name}
-									</span>
-								);
-							case "timer":
-								return (
-									<span key={key} className="token-timer">
-										{token.duration} {token.unit}
-									</span>
-								);
-							case "equipment":
-								return (
-									<span key={key} className="token-equipment">
-										{token.name}
-									</span>
-								);
-							default:
-								return null;
-						}
-					})}
-				</p>
+			{sections.map((section) => (
+				<div key={section.name || "__default"} className="step-section">
+					{hasNamedSections && section.name && (
+						<h3 className="step-section-header">{section.name}</h3>
+					)}
+					{section.steps.map((step, stepIndex) => (
+						<p key={stepKey(step, stepIndex)} className="step-paragraph">
+							{step.tokens.map((token, tokenIndex) => {
+								const key = tokenKey(token, tokenIndex);
+								switch (token.type) {
+									case "text":
+										return <span key={key}>{token.value}</span>;
+									case "ingredient":
+										return (
+											<span key={key} className="token-ingredient">
+												{token.amount
+													? `${scaleAmount(token.amount, scale)} `
+													: ""}
+												{token.unit ? `${token.unit} ` : ""}
+												{token.name}
+											</span>
+										);
+									case "timer":
+										return (
+											<span key={key} className="token-timer">
+												{token.duration} {token.unit}
+											</span>
+										);
+									case "equipment":
+										return (
+											<span key={key} className="token-equipment">
+												{token.name}
+											</span>
+										);
+									default:
+										return null;
+								}
+							})}
+						</p>
+					))}
+				</div>
 			))}
 		</div>
 	);

@@ -6,7 +6,7 @@ describe("serializeRecipe", () => {
 	it("serializes metadata", () => {
 		const recipe = {
 			metadata: { "time required": "30 Minuten", servings: "2" },
-			steps: [],
+			sections: [],
 		};
 		const output = serializeRecipe(recipe);
 		expect(output).toContain(">> time required: 30 Minuten");
@@ -16,16 +16,21 @@ describe("serializeRecipe", () => {
 	it("serializes ingredients back to cooklang format", () => {
 		const recipe = {
 			metadata: {},
-			steps: [
+			sections: [
 				{
-					tokens: [
+					name: "",
+					steps: [
 						{
-							type: "ingredient" as const,
-							name: "Hackfleisch",
-							amount: "500",
-							unit: "g",
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Hackfleisch",
+									amount: "500",
+									unit: "g",
+								},
+								{ type: "text" as const, value: " anbraten." },
+							],
 						},
-						{ type: "text" as const, value: " anbraten." },
 					],
 				},
 			],
@@ -37,10 +42,20 @@ describe("serializeRecipe", () => {
 	it("serializes ingredient without amount", () => {
 		const recipe = {
 			metadata: {},
-			steps: [
+			sections: [
 				{
-					tokens: [
-						{ type: "ingredient" as const, name: "Salz", amount: "", unit: "" },
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "ingredient" as const,
+									name: "Salz",
+									amount: "",
+									unit: "",
+								},
+							],
+						},
 					],
 				},
 			],
@@ -53,9 +68,14 @@ describe("serializeRecipe", () => {
 	it("serializes equipment with spaces using braces", () => {
 		const recipe = {
 			metadata: {},
-			steps: [
+			sections: [
 				{
-					tokens: [{ type: "equipment" as const, name: "großen Schüssel" }],
+					name: "",
+					steps: [
+						{
+							tokens: [{ type: "equipment" as const, name: "großen Schüssel" }],
+						},
+					],
 				},
 			],
 		};
@@ -66,14 +86,19 @@ describe("serializeRecipe", () => {
 	it("serializes timer with name", () => {
 		const recipe = {
 			metadata: {},
-			steps: [
+			sections: [
 				{
-					tokens: [
+					name: "",
+					steps: [
 						{
-							type: "timer" as const,
-							name: "braten",
-							duration: "4",
-							unit: "Minuten",
+							tokens: [
+								{
+									type: "timer" as const,
+									name: "braten",
+									duration: "4",
+									unit: "Minuten",
+								},
+							],
 						},
 					],
 				},
@@ -86,14 +111,19 @@ describe("serializeRecipe", () => {
 	it("serializes timer without name", () => {
 		const recipe = {
 			metadata: {},
-			steps: [
+			sections: [
 				{
-					tokens: [
+					name: "",
+					steps: [
 						{
-							type: "timer" as const,
-							name: "",
-							duration: "10",
-							unit: "Minuten",
+							tokens: [
+								{
+									type: "timer" as const,
+									name: "",
+									duration: "10",
+									unit: "Minuten",
+								},
+							],
 						},
 					],
 				},
@@ -114,6 +144,149 @@ describe("serializeRecipe", () => {
 		const output = serializeRecipe(parsed);
 		const reparsed = parseRecipe(output);
 		expect(reparsed.metadata).toEqual(parsed.metadata);
-		expect(reparsed.steps.length).toBe(parsed.steps.length);
+		expect(reparsed.sections[0].steps.length).toBe(
+			parsed.sections[0].steps.length,
+		);
+	});
+
+	it("serializes inline comment", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{ type: "text" as const, value: "Zwiebel anbraten. " },
+								{ type: "inlineComment" as const, value: "bis glasig" },
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("Zwiebel anbraten. -- bis glasig");
+	});
+
+	it("serializes block comment", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "blockComment" as const,
+									value: "Tipp: Raumtemperatur",
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("[- Tipp: Raumtemperatur -]");
+	});
+
+	it("roundtrips a recipe with inline comments", () => {
+		const input = "@Öl{2%EL} erhitzen. -- auf mittlerer Hitze";
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		const reparsed = parseRecipe(output);
+		expect(reparsed.sections[0].steps.length).toBe(
+			parsed.sections[0].steps.length,
+		);
+		expect(
+			reparsed.sections[0].steps[0].tokens.find(
+				(t) => t.type === "inlineComment",
+			),
+		).toMatchObject({ value: "auf mittlerer Hitze" });
+	});
+
+	it("roundtrips a recipe with block comments", () => {
+		const input = `[- Hinweis -]
+@Hackfleisch{500%g} anbraten.`;
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		const reparsed = parseRecipe(output);
+		expect(reparsed.sections[0].steps.length).toBe(
+			parsed.sections[0].steps.length,
+		);
+		expect(reparsed.sections[0].steps[0].tokens[0]).toMatchObject({
+			type: "blockComment",
+			value: "Hinweis",
+		});
+	});
+
+	it("serializes a section header", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "Teig",
+					steps: [
+						{ tokens: [{ type: "text" as const, value: "Mehl verrühren." }] },
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("= Teig\n\nMehl verrühren.");
+	});
+
+	it("serializes multiple sections", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "Teig",
+					steps: [
+						{ tokens: [{ type: "text" as const, value: "Mehl verrühren." }] },
+					],
+				},
+				{
+					name: "Füllung",
+					steps: [
+						{ tokens: [{ type: "text" as const, value: "Fleisch anbraten." }] },
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe(
+			"= Teig\n\nMehl verrühren.\n\n= Füllung\n\nFleisch anbraten.",
+		);
+	});
+
+	it("serializes unnamed section without header", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{ tokens: [{ type: "text" as const, value: "Schritt eins." }] },
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("Schritt eins.");
+	});
+
+	it("roundtrips a recipe with sections", () => {
+		const input =
+			">> servings: 2\n\n= Teig\n\n@Mehl{500%g} verrühren.\n\n= Füllung\n\n@Hackfleisch{300%g} anbraten.";
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		const reparsed = parseRecipe(output);
+		expect(reparsed.sections).toHaveLength(2);
+		expect(reparsed.sections[0].name).toBe("Teig");
+		expect(reparsed.sections[1].name).toBe("Füllung");
 	});
 });
