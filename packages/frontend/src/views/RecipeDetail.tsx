@@ -70,13 +70,53 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 							{recipe.metadata["time required"]}
 						</span>
 					)}
+					{recipe.metadata["prep time"] && (
+						<span className="detail-badge">
+							Vorbereitung: {recipe.metadata["prep time"]}
+						</span>
+					)}
+					{recipe.metadata["cook time"] && (
+						<span className="detail-badge">
+							Kochen: {recipe.metadata["cook time"]}
+						</span>
+					)}
 					{recipe.metadata.course && (
 						<span className="detail-badge">{recipe.metadata.course}</span>
 					)}
 					{recipe.metadata.servings && (
 						<span className="detail-badge">{recipe.metadata.servings}</span>
 					)}
+					{recipe.metadata.difficulty && (
+						<span className="detail-badge">{recipe.metadata.difficulty}</span>
+					)}
+					{recipe.metadata.cuisine && (
+						<span className="detail-badge">{recipe.metadata.cuisine}</span>
+					)}
+					{recipe.metadata.diet && (
+						<span className="detail-badge">{recipe.metadata.diet}</span>
+					)}
+					{recipe.metadata.tags && (
+						<span className="detail-badge">{recipe.metadata.tags}</span>
+					)}
 				</div>
+				{recipe.metadata.description && (
+					<p className="detail-description">{recipe.metadata.description}</p>
+				)}
+				{(recipe.metadata.source || recipe.metadata.author) && (
+					<p className="detail-source">
+						{recipe.metadata.author && <>Von: {recipe.metadata.author}</>}
+						{recipe.metadata.author && recipe.metadata.source && " \u00b7 "}
+						{recipe.metadata.source && (
+							<a
+								href={recipe.metadata.source}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Quelle
+							</a>
+						)}
+					</p>
+				)}
 			</div>
 
 			<Tabs.Root defaultValue="zutaten">

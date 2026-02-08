@@ -33,6 +33,23 @@
 	color: #78716c;
 }
 
+.detail-description {
+	color: #78716c;
+	font-size: 0.9375rem;
+	line-height: 1.5;
+	margin-bottom: 1.5rem;
+}
+
+.detail-source {
+	font-size: 0.8125rem;
+	color: #78716c;
+	margin-bottom: 1.5rem;
+}
+
+.detail-source a {
+	color: var(--color-primary);
+}
+
 /* Portion calculator */
 .portion-calculator {
 	display: flex;
