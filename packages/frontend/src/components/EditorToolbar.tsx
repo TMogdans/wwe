@@ -25,6 +25,10 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 		editor?.chain().focus().insertEquipment({ name: "" }).run();
 	}
 
+	function insertComment() {
+		editor?.chain().focus().insertComment({ value: "" }).run();
+	}
+
 	return (
 		<div className="editor-toolbar">
 			<div className="editor-toolbar__buttons">
@@ -52,9 +56,18 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 				>
 					Equipment
 				</button>
+				<button
+					type="button"
+					className="editor-toolbar__btn editor-toolbar__btn--comment"
+					onClick={insertComment}
+					disabled={!editor}
+				>
+					Kommentar
+				</button>
 			</div>
 			<p className="editor-toolbar__hint">
-				Tipp: Tippe /zutat, /timer oder /equipment um schnell einzufuegen
+				Tipp: Tippe /zutat, /timer, /equipment oder /kommentar um schnell
+				einzufuegen
 			</p>
 		</div>
 	);

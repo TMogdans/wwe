@@ -29,6 +29,12 @@ export const SlashCommands = Extension.create({
 					chain().deleteRange(range).insertEquipment({ name: "" }).run();
 				},
 			}),
+			new InputRule({
+				find: /\/kommentar\s$/,
+				handler: ({ state, range, chain }) => {
+					chain().deleteRange(range).insertComment({ value: "" }).run();
+				},
+			}),
 		];
 	},
 });
