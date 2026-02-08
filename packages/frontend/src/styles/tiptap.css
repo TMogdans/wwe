@@ -55,6 +55,25 @@
 	background: color-mix(in srgb, var(--color-equipment) 25%, transparent);
 }
 
+/* Comment chips */
+.comment-chip {
+	display: inline;
+}
+
+.comment-chip__label {
+	background: color-mix(in srgb, var(--color-comment) 15%, transparent);
+	color: var(--color-comment);
+	padding: 2px 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-style: italic;
+	white-space: nowrap;
+}
+
+.comment-chip__label:hover {
+	background: color-mix(in srgb, var(--color-comment) 25%, transparent);
+}
+
 /* Popover */
 .popover-content {
 	background: var(--color-surface);
