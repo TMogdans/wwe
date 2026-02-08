@@ -20,6 +20,13 @@ export function cooklangToTiptapDoc(content: string): JSONContent {
 					content: [{ type: "text", text: sectionMatch[1].trim() }],
 				};
 			}
+			if (trimmed.startsWith(">") && !trimmed.startsWith(">>")) {
+				const noteContent = trimmed.slice(1).trim();
+				return {
+					type: "note",
+					content: parseCooklangTokens(noteContent),
+				};
+			}
 			return {
 				type: "paragraph",
 				content: parseCooklangTokens(trimmed.replace(/\n/g, " ")),
@@ -188,7 +195,7 @@ export function tiptapDocToCooklang(doc: JSONContent): string {
 				return `= ${text}`;
 			}
 			if (!node.content) return "";
-			return node.content
+			const inner = node.content
 				.map((child) => {
 					if (child.type === "text") return child.text ?? "";
 					if (child.type === "ingredient") {
@@ -214,6 +221,10 @@ export function tiptapDocToCooklang(doc: JSONContent): string {
 					return "";
 				})
 				.join("");
+			if (node.type === "note") {
+				return `> ${inner}`;
+			}
+			return inner;
 		})
 		.join("\n\n");
 }
@@ -276,7 +287,7 @@ export function sectionsToTiptapDoc(
 		}
 		for (const step of section.steps) {
 			content.push({
-				type: "paragraph",
+				type: step.isNote ? "note" : "paragraph",
 				content: step.tokens.map(tokenToTiptapNode),
 			});
 		}

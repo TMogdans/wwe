@@ -78,7 +78,7 @@ export function serializeRecipe(recipe: CooklangRecipe): string {
 		for (let j = 0; j < section.steps.length; j++) {
 			const step = section.steps[j];
 			const stepText = step.tokens.map(serializeToken).join("");
-			parts.push(stepText);
+			parts.push(step.isNote ? `> ${stepText}` : stepText);
 		}
 	}
 

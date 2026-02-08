@@ -148,6 +148,17 @@
 	background: color-mix(in srgb, var(--color-comment) 10%, transparent);
 }
 
+.editor-toolbar__btn--note {
+	color: var(--color-comment);
+	border-color: color-mix(in srgb, var(--color-comment) 40%, transparent);
+}
+
+.editor-toolbar__btn--note:hover:not(:disabled) {
+	color: var(--color-comment);
+	border-color: var(--color-comment);
+	background: color-mix(in srgb, var(--color-comment) 10%, transparent);
+}
+
 .editor-toolbar__hint {
 	font-size: 0.75rem;
 	color: #78716c;

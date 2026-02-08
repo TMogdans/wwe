@@ -289,4 +289,63 @@ describe("serializeRecipe", () => {
 		expect(reparsed.sections[0].name).toBe("Teig");
 		expect(reparsed.sections[1].name).toBe("Füllung");
 	});
+
+	it("serializes a note step", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [{ type: "text" as const, value: "Hinweis zum Rezept." }],
+							isNote: true,
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("> Hinweis zum Rezept.");
+	});
+
+	it("serializes a note with tokens", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{ type: "text" as const, value: "Tipp: " },
+								{
+									type: "ingredient" as const,
+									name: "Butter",
+									amount: "50",
+									unit: "g",
+								},
+								{ type: "text" as const, value: " vorher schmelzen." },
+							],
+							isNote: true,
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("> Tipp: @Butter{50%g} vorher schmelzen.");
+	});
+
+	it("roundtrips a recipe with notes", () => {
+		const input = `> Ein kleiner Hinweis.
+
+@Mehl{500%g} verrühren.`;
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		const reparsed = parseRecipe(output);
+		expect(reparsed.sections[0].steps).toHaveLength(2);
+		expect(reparsed.sections[0].steps[0].isNote).toBe(true);
+		expect(reparsed.sections[0].steps[1].isNote).toBeUndefined();
+	});
 });

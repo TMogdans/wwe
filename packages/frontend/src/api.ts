@@ -23,6 +23,7 @@ export interface RecipeDetail {
 				| { type: "inlineComment"; value: string }
 				| { type: "blockComment"; value: string }
 			>;
+			isNote?: boolean;
 		}>;
 	}>;
 }

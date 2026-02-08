@@ -79,6 +79,14 @@ export function parseRecipe(input: string): CooklangRecipe {
 			continue;
 		}
 
+		// Detect note lines: > (but not >>)
+		if (trimmed.startsWith(">") && !trimmed.startsWith(">>")) {
+			const noteContent = trimmed.slice(1).trim();
+			const result = tokenizeLine(noteContent);
+			currentSection.steps.push({ tokens: result.tokens, isNote: true });
+			continue;
+		}
+
 		if (trimmed === "") {
 			continue;
 		}

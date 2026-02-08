@@ -62,7 +62,14 @@ export function StepList({ sections, scale }: StepListProps) {
 						<h3 className="step-section-header">{section.name}</h3>
 					)}
 					{section.steps.map((step, stepIndex) => (
-						<p key={stepKey(step, stepIndex)} className="step-paragraph">
+						<p
+							key={stepKey(step, stepIndex)}
+							className={
+								step.isNote
+									? "step-paragraph step-paragraph--note"
+									: "step-paragraph"
+							}
+						>
 							{step.tokens.map((token, tokenIndex) => {
 								const key = tokenKey(token, tokenIndex);
 								switch (token.type) {

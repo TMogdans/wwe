@@ -139,6 +139,15 @@
 	margin-bottom: 0.75rem;
 }
 
+/* Note blocks */
+.note-block {
+	border-left: 3px solid var(--color-comment);
+	padding-left: 1rem;
+	color: var(--color-comment);
+	font-style: italic;
+	margin-bottom: 0.75rem;
+}
+
 .tiptap-editor .ProseMirror:focus {
 	border-color: var(--color-primary);
 }

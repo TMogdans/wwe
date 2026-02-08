@@ -46,6 +46,7 @@ export type CooklangToken =
 
 export interface CooklangStep {
 	tokens: CooklangToken[];
+	isNote?: boolean;
 }
 
 export interface CooklangSection {

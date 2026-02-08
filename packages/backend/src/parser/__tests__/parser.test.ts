@@ -183,4 +183,57 @@ Ende -] Weiter hier.`;
 		expect(recipe.sections[0].name).toBe("");
 		expect(recipe.sections[0].steps).toHaveLength(2);
 	});
+
+	it("parses a note line", () => {
+		const input = "> Dieses Rezept stammt aus Omas Kochbuch.";
+		const recipe = parseRecipe(input);
+		expect(recipe.sections[0].steps).toHaveLength(1);
+		expect(recipe.sections[0].steps[0].isNote).toBe(true);
+		expect(recipe.sections[0].steps[0].tokens).toEqual([
+			{ type: "text", value: "Dieses Rezept stammt aus Omas Kochbuch." },
+		]);
+	});
+
+	it("parses note with cooklang tokens", () => {
+		const input = "> Tipp: @Butter{50%g} vorher schmelzen.";
+		const recipe = parseRecipe(input);
+		expect(recipe.sections[0].steps[0].isNote).toBe(true);
+		expect(recipe.sections[0].steps[0].tokens).toEqual([
+			{ type: "text", value: "Tipp: " },
+			{ type: "ingredient", name: "Butter", amount: "50", unit: "g" },
+			{ type: "text", value: " vorher schmelzen." },
+		]);
+	});
+
+	it("distinguishes notes from regular steps", () => {
+		const input = `> Hinweis zum Rezept.
+
+@Mehl{500%g} in eine Schüssel geben.`;
+		const recipe = parseRecipe(input);
+		expect(recipe.sections[0].steps).toHaveLength(2);
+		expect(recipe.sections[0].steps[0].isNote).toBe(true);
+		expect(recipe.sections[0].steps[1].isNote).toBeUndefined();
+	});
+
+	it("parses note within a section", () => {
+		const input = `= Teig
+
+> Am besten den Teig am Vortag vorbereiten.
+
+@Mehl{500%g} verrühren.`;
+		const recipe = parseRecipe(input);
+		expect(recipe.sections[0].steps).toHaveLength(2);
+		expect(recipe.sections[0].steps[0].isNote).toBe(true);
+		expect(recipe.sections[0].steps[1].isNote).toBeUndefined();
+	});
+
+	it("does not confuse >> metadata with > note", () => {
+		const input = `>> servings: 4
+
+> Eine kleine Notiz.`;
+		const recipe = parseRecipe(input);
+		expect(recipe.metadata.servings).toBe("4");
+		expect(recipe.sections[0].steps).toHaveLength(1);
+		expect(recipe.sections[0].steps[0].isNote).toBe(true);
+	});
 });

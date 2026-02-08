@@ -19,12 +19,15 @@ type CookStep = {
 function flattenSections(sections: RecipeDetail["sections"]): CookStep[] {
 	const result: CookStep[] = [];
 	for (const section of sections) {
+		let isFirst = true;
 		for (let i = 0; i < section.steps.length; i++) {
+			if (section.steps[i].isNote) continue;
 			result.push({
 				sectionName: section.name,
 				tokens: section.steps[i].tokens,
-				isFirstInSection: i === 0 && section.name !== "",
+				isFirstInSection: isFirst && section.name !== "",
 			});
+			isFirst = false;
 		}
 	}
 	return result;
