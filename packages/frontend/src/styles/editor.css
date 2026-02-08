@@ -60,9 +60,25 @@
 
 .metadata-form__row {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
 	gap: 1rem;
 	margin-top: 1rem;
+}
+
+.metadata-form__row--3 {
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.metadata-form__row--2 {
+	grid-template-columns: 1fr 1fr;
+}
+
+.metadata-form__row--1 {
+	grid-template-columns: 1fr;
+}
+
+.metadata-form__textarea {
+	resize: vertical;
+	min-height: 3rem;
 }
 
 /* Name field is full width */
@@ -210,7 +226,8 @@
 
 /* Responsive */
 @media (max-width: 640px) {
-	.metadata-form__row {
+	.metadata-form__row--3,
+	.metadata-form__row--2 {
 		grid-template-columns: 1fr;
 	}
 }
