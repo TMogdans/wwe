@@ -471,4 +471,64 @@ describe("serializeRecipe", () => {
 		expect(reparsed.sections[0].steps[0].isNote).toBe(true);
 		expect(reparsed.sections[0].steps[1].isNote).toBeUndefined();
 	});
+
+	// --- Recipe references ---
+
+	it("serializes recipe reference with amount and unit", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "recipeRef" as const,
+									ref: "./sauces/Hollandaise",
+									amount: "150",
+									unit: "g",
+								},
+								{ type: "text" as const, value: " servieren." },
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@./sauces/Hollandaise{150%g} servieren.");
+	});
+
+	it("serializes recipe reference without amount", () => {
+		const recipe = {
+			metadata: {},
+			sections: [
+				{
+					name: "",
+					steps: [
+						{
+							tokens: [
+								{
+									type: "recipeRef" as const,
+									ref: "./Pizzateig",
+									amount: "",
+									unit: "",
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+		const output = serializeRecipe(recipe);
+		expect(output).toBe("@./Pizzateig");
+	});
+
+	it("roundtrips recipe reference", () => {
+		const input = "@./sauces/Hollandaise{150%g} servieren.";
+		const parsed = parseRecipe(input);
+		const output = serializeRecipe(parsed);
+		expect(output).toBe("@./sauces/Hollandaise{150%g} servieren.");
+	});
 });

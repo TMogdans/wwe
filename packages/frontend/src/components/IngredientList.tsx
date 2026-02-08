@@ -18,6 +18,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 					unit: string;
 					preparation: string;
 					fixed?: boolean;
+					recipeRef?: string;
 				}> = [];
 
 				for (const step of section.steps) {
@@ -29,6 +30,14 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 								unit: token.unit,
 								preparation: token.preparation,
 								fixed: token.fixed,
+							});
+						} else if (token.type === "recipeRef") {
+							ingredients.push({
+								name: token.ref.split("/").pop() ?? token.ref,
+								amount: token.amount,
+								unit: token.unit,
+								preparation: "",
+								recipeRef: token.ref,
 							});
 						}
 					}
@@ -52,7 +61,16 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 									{ing.unit && (
 										<span className="ingredient-unit">{ing.unit}</span>
 									)}{" "}
-									<span className="ingredient-name">{ing.name}</span>
+									{ing.recipeRef ? (
+										<a
+											href={`#/rezept/${encodeURIComponent(ing.recipeRef.replace(/^\.\//, ""))}`}
+											className="ingredient-name ingredient-recipe-ref"
+										>
+											{ing.name}
+										</a>
+									) : (
+										<span className="ingredient-name">{ing.name}</span>
+									)}
 									{ing.preparation && (
 										<span className="ingredient-preparation">
 											{" "}

@@ -3,6 +3,7 @@ import type {
 	CooklangEquipment,
 	CooklangIngredient,
 	CooklangInlineComment,
+	CooklangRecipeRef,
 	CooklangText,
 	CooklangTimer,
 	CooklangToken,
@@ -160,6 +161,45 @@ export function tokenizeLine(line: string): TokenizeResult {
 		if (ch === "@") {
 			flushText();
 			i++; // skip '@'
+
+			// Recipe reference: @./path...
+			if (i + 1 < line.length && line[i] === "." && line[i + 1] === "/") {
+				const refBraceIndex = findBraceBeforeNextTrigger(line, i);
+				if (refBraceIndex !== -1) {
+					const ref = line.substring(i, refBraceIndex);
+					const closingBrace = line.indexOf("}", refBraceIndex + 1);
+					if (closingBrace === -1) {
+						textAccumulator += `@${line.substring(i)}`;
+						i = line.length;
+						continue;
+					}
+					const content = line.substring(refBraceIndex + 1, closingBrace);
+					const { amount, unit } = parseBraceContent(content);
+					tokens.push({
+						type: "recipeRef",
+						ref,
+						amount,
+						unit,
+					} as CooklangRecipeRef);
+					i = closingBrace + 1;
+				} else {
+					// Read ref path until space or comma (allow dots and slashes)
+					let end = i;
+					while (end < line.length) {
+						const c = line[end];
+						if (c === " " || c === ",") break;
+						end++;
+					}
+					tokens.push({
+						type: "recipeRef",
+						ref: line.substring(i, end),
+						amount: "",
+						unit: "",
+					} as CooklangRecipeRef);
+					i = end;
+				}
+				continue;
+			}
 
 			const braceIndex = findBraceBeforeNextTrigger(line, i);
 

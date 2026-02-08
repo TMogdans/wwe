@@ -112,6 +112,18 @@ function parseToken(
 		const end = braceEnd + 1;
 
 		if (trigger === "@") {
+			if (name.startsWith("./")) {
+				const parts = braceContent.split("%");
+				const amount = parts[0] ?? "";
+				const unit = parts[1] ?? "";
+				return {
+					node: {
+						type: "recipeRef",
+						attrs: { ref: name, amount, unit },
+					},
+					end,
+				};
+			}
 			let raw = braceContent;
 			let fixed = false;
 			if (raw.startsWith("=")) {
@@ -166,6 +178,15 @@ function parseToken(
 	// No braces: single-word token
 	if (name) {
 		if (trigger === "@") {
+			if (name.startsWith("./")) {
+				return {
+					node: {
+						type: "recipeRef",
+						attrs: { ref: name, amount: "", unit: "" },
+					},
+					end: i,
+				};
+			}
 			return {
 				node: {
 					type: "ingredient",
@@ -238,6 +259,11 @@ export function tiptapDocToCooklang(doc: JSONContent): string {
 						const { value } = child.attrs ?? {};
 						return `[- ${value} -]`;
 					}
+					if (child.type === "recipeRef") {
+						const { ref, amount, unit } = child.attrs ?? {};
+						if (!amount && !unit) return `@${ref}`;
+						return `@${ref}{${amount}%${unit}}`;
+					}
 					return "";
 				})
 				.join("");
@@ -289,6 +315,15 @@ function tokenToTiptapNode(token: Token): JSONContent {
 			return {
 				type: "comment",
 				attrs: { value: token.value },
+			};
+		case "recipeRef":
+			return {
+				type: "recipeRef",
+				attrs: {
+					ref: token.ref,
+					amount: token.amount,
+					unit: token.unit,
+				},
 			};
 		default:
 			return { type: "text", text: "" };

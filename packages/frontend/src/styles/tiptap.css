@@ -78,6 +78,26 @@
 	background: color-mix(in srgb, var(--color-comment) 25%, transparent);
 }
 
+/* Recipe reference chips */
+.recipe-ref-chip {
+	display: inline;
+}
+
+.recipe-ref-chip__label {
+	background: color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent);
+	color: var(--color-primary, #2563eb);
+	padding: 2px 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-weight: 600;
+	white-space: nowrap;
+	text-decoration: underline;
+}
+
+.recipe-ref-chip__label:hover {
+	background: color-mix(in srgb, var(--color-primary, #2563eb) 25%, transparent);
+}
+
 /* Popover */
 .popover-content {
 	background: var(--color-surface);

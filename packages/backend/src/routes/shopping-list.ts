@@ -43,6 +43,51 @@ async function fileExists(filePath: string): Promise<boolean> {
 	}
 }
 
+async function collectIngredients(
+	recipesDir: string,
+	slug: string,
+	scale: number,
+	visited: Set<string>,
+): Promise<CooklangIngredient[]> {
+	if (visited.has(slug)) return [];
+	visited.add(slug);
+
+	const filePath = resolveRecipePath(recipesDir, slug);
+	if (!(await fileExists(filePath))) return [];
+
+	const content = await readFile(filePath, "utf-8");
+	const parsed = parseRecipe(content);
+	const ingredients: CooklangIngredient[] = [];
+
+	for (const section of parsed.sections) {
+		for (const step of section.steps) {
+			for (const token of step.tokens) {
+				if (token.type === "ingredient") {
+					ingredients.push(
+						scale !== 1
+							? {
+									...token,
+									amount: scaleAmount(token.amount, scale, token.fixed),
+								}
+							: token,
+					);
+				} else if (token.type === "recipeRef") {
+					const refSlug = token.ref.replace(/^\.\//, "");
+					const refIngredients = await collectIngredients(
+						recipesDir,
+						refSlug,
+						scale,
+						visited,
+					);
+					ingredients.push(...refIngredients);
+				}
+			}
+		}
+	}
+
+	return ingredients;
+}
+
 export function createShoppingListRouter(recipesDir: string): Router {
 	const router = Router();
 
@@ -90,23 +135,13 @@ export function createShoppingListRouter(recipesDir: string): Router {
 				: undefined;
 			const scale = servings && baseServings ? servings / baseServings : 1;
 
-			const ingredients: CooklangIngredient[] = [];
-			for (const section of parsed.sections) {
-				for (const step of section.steps) {
-					for (const token of step.tokens) {
-						if (token.type === "ingredient") {
-							ingredients.push(
-								scale !== 1
-									? {
-											...token,
-											amount: scaleAmount(token.amount, scale, token.fixed),
-										}
-									: token,
-							);
-						}
-					}
-				}
-			}
+			const visited = new Set<string>();
+			const ingredients = await collectIngredients(
+				recipesDir,
+				slug,
+				scale,
+				visited,
+			);
 
 			recipeIngredientsList.push({
 				recipeName: slug,

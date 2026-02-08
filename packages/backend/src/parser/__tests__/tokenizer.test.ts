@@ -391,4 +391,85 @@ describe("tokenizeLine", () => {
 			{ type: "text", value: " weiter" },
 		]);
 	});
+
+	// --- Recipe references ---
+
+	it("parses recipe reference with amount and unit", () => {
+		const { tokens } = tokenizeLine(
+			"Dazu @./sauces/Hollandaise{150%g} servieren.",
+		);
+		expect(tokens).toEqual([
+			{ type: "text", value: "Dazu " },
+			{
+				type: "recipeRef",
+				ref: "./sauces/Hollandaise",
+				amount: "150",
+				unit: "g",
+			},
+			{ type: "text", value: " servieren." },
+		]);
+	});
+
+	it("parses recipe reference without amount", () => {
+		const { tokens } = tokenizeLine("Den @./Pizzateig dazu.");
+		expect(tokens).toEqual([
+			{ type: "text", value: "Den " },
+			{
+				type: "recipeRef",
+				ref: "./Pizzateig",
+				amount: "",
+				unit: "",
+			},
+			{ type: "text", value: " dazu." },
+		]);
+	});
+
+	it("parses recipe reference with braces and unit", () => {
+		const { tokens } = tokenizeLine("@./Pizzateig{1%Portion} ausrollen.");
+		expect(tokens).toEqual([
+			{
+				type: "recipeRef",
+				ref: "./Pizzateig",
+				amount: "1",
+				unit: "Portion",
+			},
+			{ type: "text", value: " ausrollen." },
+		]);
+	});
+
+	it("parses recipe reference in nested path", () => {
+		const { tokens } = tokenizeLine("@./basics/Gemüsebrühe{500%ml} aufkochen.");
+		expect(tokens).toEqual([
+			{
+				type: "recipeRef",
+				ref: "./basics/Gemüsebrühe",
+				amount: "500",
+				unit: "ml",
+			},
+			{ type: "text", value: " aufkochen." },
+		]);
+	});
+
+	it("parses recipe reference alongside normal ingredient", () => {
+		const { tokens } = tokenizeLine(
+			"@./Pizzateig{1%Portion} mit @Mozzarella{200%g} belegen.",
+		);
+		expect(tokens).toEqual([
+			{
+				type: "recipeRef",
+				ref: "./Pizzateig",
+				amount: "1",
+				unit: "Portion",
+			},
+			{ type: "text", value: " mit " },
+			{
+				type: "ingredient",
+				name: "Mozzarella",
+				amount: "200",
+				unit: "g",
+				preparation: "",
+			},
+			{ type: "text", value: " belegen." },
+		]);
+	});
 });

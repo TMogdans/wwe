@@ -134,4 +134,70 @@ describe("shopping list routes", () => {
 		);
 		expect(hackfleisch.entries[0].amount).toBe("500");
 	});
+
+	// --- Recipe references ---
+
+	it("POST / resolves recipe references recursively", async () => {
+		await writeFile(
+			path.join(tempDir, "Hollandaise.cook"),
+			">> servings: 2\n\n@Butter{100%g} schmelzen.\n@Eigelb{2%Stück} einrühren.",
+		);
+		await writeFile(
+			path.join(tempDir, "Spargel.cook"),
+			">> servings: 2\n\n@Spargel{500%g} kochen.\n@./Hollandaise{150%g} servieren.",
+		);
+
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["Spargel"] });
+		expect(res.status).toBe(200);
+
+		const spargel = res.body.find(
+			(i: { name: string }) => i.name === "Spargel",
+		);
+		expect(spargel).toBeDefined();
+		expect(spargel.entries[0].amount).toBe("500");
+
+		const butter = res.body.find((i: { name: string }) => i.name === "Butter");
+		expect(butter).toBeDefined();
+
+		const eigelb = res.body.find((i: { name: string }) => i.name === "Eigelb");
+		expect(eigelb).toBeDefined();
+	});
+
+	it("POST / prevents circular recipe references", async () => {
+		await writeFile(
+			path.join(tempDir, "A.cook"),
+			">> servings: 2\n\n@Mehl{100%g} sieben.\n@./B{1%Portion} dazu.",
+		);
+		await writeFile(
+			path.join(tempDir, "B.cook"),
+			">> servings: 2\n\n@Zucker{50%g} dazu.\n@./A{1%Portion} dazu.",
+		);
+
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["A"] });
+		expect(res.status).toBe(200);
+
+		const mehl = res.body.find((i: { name: string }) => i.name === "Mehl");
+		expect(mehl).toBeDefined();
+		const zucker = res.body.find((i: { name: string }) => i.name === "Zucker");
+		expect(zucker).toBeDefined();
+	});
+
+	it("POST / ignores recipe references to non-existent files", async () => {
+		await writeFile(
+			path.join(tempDir, "MitRef.cook"),
+			">> servings: 2\n\n@Mehl{100%g} sieben.\n@./NichtDa{1%Portion} dazu.",
+		);
+
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["MitRef"] });
+		expect(res.status).toBe(200);
+
+		const mehl = res.body.find((i: { name: string }) => i.name === "Mehl");
+		expect(mehl).toBeDefined();
+	});
 });

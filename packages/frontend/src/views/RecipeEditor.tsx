@@ -25,6 +25,7 @@ import {
 	EquipmentExtension,
 	IngredientExtension,
 	NoteExtension,
+	RecipeRefExtension,
 	SlashCommands,
 	TimerExtension,
 } from "../tiptap/index.js";
@@ -108,6 +109,7 @@ export function RecipeEditor({ slug }: RecipeEditorProps) {
 				EquipmentExtension,
 				CommentExtension,
 				NoteExtension,
+				RecipeRefExtension,
 				SlashCommands,
 			],
 			content: initialDoc ?? EMPTY_DOC,

@@ -19,6 +19,8 @@ function tokenKey(
 			return `timer-${index}-${token.duration}-${token.unit}`;
 		case "equipment":
 			return `equip-${index}-${token.name}`;
+		case "recipeRef":
+			return `ref-${index}-${token.ref}`;
 		default:
 			return `unknown-${index}`;
 	}
@@ -83,6 +85,20 @@ export function StepList({ sections, scale }: StepListProps) {
 												{token.name}
 											</span>
 										);
+									case "recipeRef": {
+										const refSlug = token.ref.replace(/^\.\//, "");
+										return (
+											<a
+												key={key}
+												href={`#/rezept/${encodeURIComponent(refSlug)}`}
+												className="token-recipe-ref"
+											>
+												{token.amount ? `${token.amount} ` : ""}
+												{token.unit ? `${token.unit} ` : ""}
+												{refSlug.split("/").pop()}
+											</a>
+										);
+									}
 									default:
 										return null;
 								}

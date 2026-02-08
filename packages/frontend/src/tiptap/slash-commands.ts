@@ -46,6 +46,15 @@ export const SlashCommands = Extension.create({
 					chain().deleteRange(range).setNote().run();
 				},
 			}),
+			new InputRule({
+				find: /\/rezept\s$/,
+				handler: ({ state, range, chain }) => {
+					chain()
+						.deleteRange(range)
+						.insertRecipeRef({ ref: "./", amount: "", unit: "" })
+						.run();
+				},
+			}),
 		];
 	},
 });

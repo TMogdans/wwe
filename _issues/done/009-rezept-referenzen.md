@@ -1,5 +1,6 @@
 # Rezept-Referenzen als Zutaten unterstützen
 
+**Status:** Done
 **Priorität:** Niedrig
 **Bereich:** Parser, Serializer, Frontend, Backend
 **Spec-Referenz:** https://cooklang.org/docs/spec/

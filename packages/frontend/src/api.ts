@@ -25,6 +25,7 @@ export interface RecipeDetail {
 				| { type: "equipment"; name: string }
 				| { type: "inlineComment"; value: string }
 				| { type: "blockComment"; value: string }
+				| { type: "recipeRef"; ref: string; amount: string; unit: string }
 			>;
 			isNote?: boolean;
 		}>;

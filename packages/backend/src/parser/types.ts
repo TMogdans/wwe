@@ -38,13 +38,21 @@ export interface CooklangBlockComment {
 	value: string;
 }
 
+export interface CooklangRecipeRef {
+	type: "recipeRef";
+	ref: string;
+	amount: string;
+	unit: string;
+}
+
 export type CooklangToken =
 	| CooklangIngredient
 	| CooklangTimer
 	| CooklangEquipment
 	| CooklangText
 	| CooklangInlineComment
-	| CooklangBlockComment;
+	| CooklangBlockComment
+	| CooklangRecipeRef;
 
 export interface CooklangStep {
 	tokens: CooklangToken[];

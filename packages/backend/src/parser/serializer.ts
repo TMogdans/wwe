@@ -39,6 +39,12 @@ function serializeToken(token: CooklangToken): string {
 		case "blockComment": {
 			return `[- ${token.value} -]`;
 		}
+		case "recipeRef": {
+			if (token.amount === "" && token.unit === "") {
+				return `@${token.ref}`;
+			}
+			return `@${token.ref}{${token.amount}%${token.unit}}`;
+		}
 	}
 }
 

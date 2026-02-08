@@ -197,6 +197,18 @@
 	font-weight: 600;
 }
 
+.token-recipe-ref {
+	color: var(--color-primary, #2563eb);
+	font-weight: 600;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.ingredient-recipe-ref {
+	color: var(--color-primary, #2563eb);
+	text-decoration: underline;
+}
+
 /* Action buttons */
 .detail-actions {
 	display: flex;
