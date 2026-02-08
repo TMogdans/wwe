@@ -32,8 +32,16 @@ export const updateRecipeSchema = z.object({
 	content: z.string(),
 });
 
+const slugEntry = z.union([
+	z.string(),
+	z.object({
+		slug: z.string(),
+		servings: z.number().positive().optional(),
+	}),
+]);
+
 export const shoppingListRequestSchema = z.object({
-	slugs: z.array(z.string()).min(1),
+	slugs: z.array(slugEntry).min(1),
 });
 
 export type RecipeSummary = z.infer<typeof recipeSummarySchema>;

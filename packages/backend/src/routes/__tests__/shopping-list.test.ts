@@ -92,4 +92,46 @@ describe("shopping list routes", () => {
 		expect(res.status).toBe(200);
 		expect(Array.isArray(res.body)).toBe(true);
 	});
+
+	it("POST / scales amounts when servings provided", async () => {
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({
+				slugs: [{ slug: "Chili", servings: 4 }],
+			});
+		expect(res.status).toBe(200);
+		const hackfleisch = res.body.find(
+			(i: { name: string }) => i.name === "Hackfleisch",
+		);
+		expect(hackfleisch).toBeDefined();
+		expect(hackfleisch.entries[0].amount).toBe("1000");
+	});
+
+	it("POST / does not scale fixed amounts", async () => {
+		await writeFile(
+			path.join(tempDir, "Pasta.cook"),
+			">> servings: 2\n\n@Nudeln{500%g} kochen.\n@Salz{=1%TL} hinzufuegen.",
+		);
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({
+				slugs: [{ slug: "Pasta", servings: 4 }],
+			});
+		expect(res.status).toBe(200);
+		const nudeln = res.body.find((i: { name: string }) => i.name === "Nudeln");
+		expect(nudeln.entries[0].amount).toBe("1000");
+		const salz = res.body.find((i: { name: string }) => i.name === "Salz");
+		expect(salz.entries[0].amount).toBe("1");
+	});
+
+	it("POST / works with plain string slugs (backward compatible)", async () => {
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["Chili"] });
+		expect(res.status).toBe(200);
+		const hackfleisch = res.body.find(
+			(i: { name: string }) => i.name === "Hackfleisch",
+		);
+		expect(hackfleisch.entries[0].amount).toBe("500");
+	});
 });

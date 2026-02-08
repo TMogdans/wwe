@@ -11,6 +11,7 @@ import {
 	buildSynonymMap,
 	synonymsSchema,
 } from "../schemas/shopping-list.js";
+import { scaleAmount } from "../utils/scale-amount.js";
 
 const SYNONYMS_FILE = "synonyme.json";
 
@@ -65,9 +66,14 @@ export function createShoppingListRouter(recipesDir: string): Router {
 		}
 
 		const { slugs } = result.data;
+		const normalizedSlugs = slugs.map((entry) =>
+			typeof entry === "string"
+				? { slug: entry, servings: undefined as number | undefined }
+				: entry,
+		);
 		const recipeIngredientsList: RecipeIngredients[] = [];
 
-		for (const slug of slugs) {
+		for (const { slug, servings } of normalizedSlugs) {
 			const filePath = resolveRecipePath(recipesDir, slug);
 
 			if (!(await fileExists(filePath))) {
@@ -78,12 +84,25 @@ export function createShoppingListRouter(recipesDir: string): Router {
 			const content = await readFile(filePath, "utf-8");
 			const parsed = parseRecipe(content);
 
+			const baseServingsStr = parsed.metadata.servings;
+			const baseServings = baseServingsStr
+				? Number.parseInt(baseServingsStr, 10)
+				: undefined;
+			const scale = servings && baseServings ? servings / baseServings : 1;
+
 			const ingredients: CooklangIngredient[] = [];
 			for (const section of parsed.sections) {
 				for (const step of section.steps) {
 					for (const token of step.tokens) {
 						if (token.type === "ingredient") {
-							ingredients.push(token);
+							ingredients.push(
+								scale !== 1
+									? {
+											...token,
+											amount: scaleAmount(token.amount, scale, token.fixed),
+										}
+									: token,
+							);
 						}
 					}
 				}
