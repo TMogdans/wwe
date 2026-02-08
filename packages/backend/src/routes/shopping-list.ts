@@ -6,8 +6,13 @@ import type { CooklangIngredient } from "../parser/types.js";
 import { shoppingListRequestSchema } from "../schemas/index.js";
 import {
 	type RecipeIngredients,
+	type SynonymMap,
 	aggregateIngredients,
+	buildSynonymMap,
+	synonymsSchema,
 } from "../schemas/shopping-list.js";
+
+const SYNONYMS_FILE = "synonyme.json";
 
 function slugToFilename(slug: string): string {
 	return `${decodeURIComponent(slug)}.cook`;
@@ -48,6 +53,17 @@ export function createShoppingListRouter(recipesDir: string): Router {
 			return;
 		}
 
+		let synonymMap: SynonymMap | undefined;
+		try {
+			const raw = await readFile(path.join(recipesDir, SYNONYMS_FILE), "utf-8");
+			const parsed = synonymsSchema.safeParse(JSON.parse(raw));
+			if (parsed.success) {
+				synonymMap = buildSynonymMap(parsed.data);
+			}
+		} catch {
+			// No synonyms file – continue without synonyms
+		}
+
 		const { slugs } = result.data;
 		const recipeIngredientsList: RecipeIngredients[] = [];
 
@@ -79,7 +95,7 @@ export function createShoppingListRouter(recipesDir: string): Router {
 			});
 		}
 
-		const aggregated = aggregateIngredients(recipeIngredientsList);
+		const aggregated = aggregateIngredients(recipeIngredientsList, synonymMap);
 		res.json(aggregated);
 	});
 

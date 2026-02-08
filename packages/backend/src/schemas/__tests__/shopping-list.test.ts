@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aggregateIngredients } from "../shopping-list.js";
+import { aggregateIngredients, buildSynonymMap } from "../shopping-list.js";
 
 describe("aggregateIngredients", () => {
 	it("groups identical ingredients by name", () => {
@@ -152,5 +152,137 @@ describe("aggregateIngredients", () => {
 	it("returns empty array for empty input", () => {
 		const result = aggregateIngredients([]);
 		expect(result).toEqual([]);
+	});
+
+	describe("with synonyms", () => {
+		it("groups synonyms under canonical name", () => {
+			const synonyms = buildSynonymMap([["Sahne", "Schlagsahne", "Obers"]]);
+			const input = [
+				{
+					recipeName: "A",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "Schlagsahne",
+							amount: "200",
+							unit: "ml",
+							preparation: "",
+						},
+					],
+				},
+				{
+					recipeName: "B",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "Sahne",
+							amount: "100",
+							unit: "ml",
+							preparation: "",
+						},
+					],
+				},
+			];
+			const result = aggregateIngredients(input, synonyms);
+			expect(result).toHaveLength(1);
+			expect(result[0].name).toBe("Sahne");
+			expect(result[0].entries).toHaveLength(2);
+		});
+
+		it("uses canonical name regardless of which variant appears first", () => {
+			const synonyms = buildSynonymMap([
+				["Hackfleisch", "Gehacktes", "Faschiertes"],
+			]);
+			const input = [
+				{
+					recipeName: "A",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "Faschiertes",
+							amount: "500",
+							unit: "g",
+							preparation: "",
+						},
+					],
+				},
+			];
+			const result = aggregateIngredients(input, synonyms);
+			expect(result[0].name).toBe("Hackfleisch");
+		});
+
+		it("handles synonym lookup case-insensitively", () => {
+			const synonyms = buildSynonymMap([["Thunfisch", "Tunfisch"]]);
+			const input = [
+				{
+					recipeName: "A",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "tunfisch",
+							amount: "1",
+							unit: "Dose",
+							preparation: "",
+						},
+					],
+				},
+				{
+					recipeName: "B",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "THUNFISCH",
+							amount: "1",
+							unit: "Dose",
+							preparation: "",
+						},
+					],
+				},
+			];
+			const result = aggregateIngredients(input, synonyms);
+			expect(result).toHaveLength(1);
+			expect(result[0].name).toBe("Thunfisch");
+			expect(result[0].entries).toHaveLength(2);
+		});
+
+		it("leaves non-synonym ingredients unchanged", () => {
+			const synonyms = buildSynonymMap([["Sahne", "Schlagsahne"]]);
+			const input = [
+				{
+					recipeName: "A",
+					ingredients: [
+						{
+							type: "ingredient" as const,
+							name: "Butter",
+							amount: "100",
+							unit: "g",
+							preparation: "",
+						},
+					],
+				},
+			];
+			const result = aggregateIngredients(input, synonyms);
+			expect(result[0].name).toBe("Butter");
+		});
+	});
+});
+
+describe("buildSynonymMap", () => {
+	it("maps all variants to canonical name", () => {
+		const map = buildSynonymMap([["Sahne", "Schlagsahne", "Obers"]]);
+		expect(map.get("sahne")).toBe("Sahne");
+		expect(map.get("schlagsahne")).toBe("Sahne");
+		expect(map.get("obers")).toBe("Sahne");
+	});
+
+	it("stores keys as lowercase", () => {
+		const map = buildSynonymMap([["Thunfisch", "Tunfisch"]]);
+		expect(map.get("tunfisch")).toBe("Thunfisch");
+		expect(map.has("Tunfisch")).toBe(false);
+	});
+
+	it("returns empty map for empty input", () => {
+		const map = buildSynonymMap([]);
+		expect(map.size).toBe(0);
 	});
 });

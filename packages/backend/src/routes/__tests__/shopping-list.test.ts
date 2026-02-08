@@ -56,4 +56,40 @@ describe("shopping list routes", () => {
 			.send({ slugs: ["Chili", "NonExistent"] });
 		expect(res.status).toBe(404);
 	});
+
+	it("POST / merges synonyms when synonyme.json exists", async () => {
+		await writeFile(
+			path.join(tempDir, "synonyme.json"),
+			JSON.stringify([["Hackfleisch", "Gehacktes"]]),
+		);
+		await writeFile(
+			path.join(tempDir, "Austrian.cook"),
+			"@Gehacktes{300%g} anbraten.",
+		);
+
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["Chili", "Austrian"] });
+
+		expect(res.status).toBe(200);
+		const hackfleisch = res.body.find(
+			(i: { name: string }) => i.name === "Hackfleisch",
+		);
+		expect(hackfleisch).toBeDefined();
+		expect(hackfleisch.entries).toHaveLength(2);
+		// "Gehacktes" should not appear as a separate ingredient
+		const gehacktes = res.body.find(
+			(i: { name: string }) => i.name === "Gehacktes",
+		);
+		expect(gehacktes).toBeUndefined();
+	});
+
+	it("POST / works without synonyme.json", async () => {
+		const res = await request(app)
+			.post("/api/einkaufsliste")
+			.send({ slugs: ["Chili"] });
+
+		expect(res.status).toBe(200);
+		expect(Array.isArray(res.body)).toBe(true);
+	});
 });
