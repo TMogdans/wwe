@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type RecipeDetail, fetchRecipe } from "../api.js";
+import { scaleAmount } from "../utils/scale-amount.js";
 import "../styles/cook-mode.css";
 
 interface CookModeProps {
@@ -52,22 +53,6 @@ function tokenKey(token: Token, index: number): string {
 	}
 }
 
-function scaleAmount(amount: string, scale: number): string {
-	if (!amount) return "";
-	const num = Number(amount);
-	if (!Number.isNaN(num)) {
-		const scaled = num * scale;
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	const fractionMatch = amount.match(/^(\d+)\/(\d+)$/);
-	if (fractionMatch) {
-		const decimal = Number(fractionMatch[1]) / Number(fractionMatch[2]);
-		const scaled = decimal * scale;
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	return amount;
-}
-
 function renderToken(token: Token, index: number, scale: number) {
 	const key = tokenKey(token, index);
 	switch (token.type) {
@@ -76,7 +61,9 @@ function renderToken(token: Token, index: number, scale: number) {
 		case "ingredient":
 			return (
 				<span key={key} className="token-ingredient">
-					{token.amount ? `${scaleAmount(token.amount, scale)} ` : ""}
+					{token.amount
+						? `${scaleAmount(token.amount, scale, token.fixed)} `
+						: ""}
 					{token.unit ? `${token.unit} ` : ""}
 					{token.name}
 				</span>

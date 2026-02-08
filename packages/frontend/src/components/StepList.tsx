@@ -1,24 +1,9 @@
 import type { RecipeDetail } from "../api.js";
+import { scaleAmount } from "../utils/scale-amount.js";
 
 interface StepListProps {
 	sections: RecipeDetail["sections"];
 	scale: number;
-}
-
-function scaleAmount(amount: string, scale: number): string {
-	if (!amount) return "";
-	const num = Number(amount);
-	if (!Number.isNaN(num)) {
-		const scaled = num * scale;
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	const fractionMatch = amount.match(/^(\d+)\/(\d+)$/);
-	if (fractionMatch) {
-		const decimal = Number(fractionMatch[1]) / Number(fractionMatch[2]);
-		const scaled = decimal * scale;
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	return amount;
 }
 
 function tokenKey(
@@ -79,7 +64,7 @@ export function StepList({ sections, scale }: StepListProps) {
 										return (
 											<span key={key} className="token-ingredient">
 												{token.amount
-													? `${scaleAmount(token.amount, scale)} `
+													? `${scaleAmount(token.amount, scale, token.fixed)} `
 													: ""}
 												{token.unit ? `${token.unit} ` : ""}
 												{token.name}

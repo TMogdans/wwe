@@ -1,28 +1,9 @@
 import type { RecipeDetail } from "../api.js";
+import { scaleAmount } from "../utils/scale-amount.js";
 
 interface IngredientListProps {
 	sections: RecipeDetail["sections"];
 	scale: number;
-}
-
-function scaleAmount(amount: string, scale: number): string {
-	if (!amount) return "";
-	// Try to parse as number
-	const num = Number(amount);
-	if (!Number.isNaN(num)) {
-		const scaled = num * scale;
-		// Show nice fractions or round to 1 decimal
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	// Try fraction like "1/2"
-	const fractionMatch = amount.match(/^(\d+)\/(\d+)$/);
-	if (fractionMatch) {
-		const decimal = Number(fractionMatch[1]) / Number(fractionMatch[2]);
-		const scaled = decimal * scale;
-		return scaled % 1 === 0 ? String(scaled) : scaled.toFixed(1);
-	}
-	// Text amounts like "Handvoll", "kleine Dose" - don't scale
-	return amount;
 }
 
 export function IngredientList({ sections, scale }: IngredientListProps) {
@@ -36,6 +17,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 					amount: string;
 					unit: string;
 					preparation: string;
+					fixed?: boolean;
 				}> = [];
 
 				for (const step of section.steps) {
@@ -46,6 +28,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 								amount: token.amount,
 								unit: token.unit,
 								preparation: token.preparation,
+								fixed: token.fixed,
 							});
 						}
 					}
@@ -63,7 +46,7 @@ export function IngredientList({ sections, scale }: IngredientListProps) {
 								<li key={`${ing.name}-${i}`} className="ingredient-item">
 									{ing.amount && (
 										<span className="ingredient-amount">
-											{scaleAmount(ing.amount, scale)}
+											{scaleAmount(ing.amount, scale, ing.fixed)}
 										</span>
 									)}{" "}
 									{ing.unit && (
