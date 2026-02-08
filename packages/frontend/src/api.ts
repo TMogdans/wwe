@@ -1,11 +1,7 @@
 export interface RecipeSummary {
 	slug: string;
 	name: string;
-	metadata: {
-		"time required"?: string;
-		course?: string;
-		servings?: string;
-	};
+	metadata: Record<string, string>;
 }
 
 export interface RecipeDetail {

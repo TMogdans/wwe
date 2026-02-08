@@ -2,6 +2,15 @@ export interface RecipeMetadata {
 	timeRequired: string;
 	course: string;
 	servings: string;
+	tags: string;
+	source: string;
+	author: string;
+	prepTime: string;
+	cookTime: string;
+	difficulty: string;
+	cuisine: string;
+	diet: string;
+	description: string;
 }
 
 interface MetadataFormProps {
