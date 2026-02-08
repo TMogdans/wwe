@@ -1,5 +1,7 @@
 # Erweiterte Metadata-Felder laut Spec unterstützen
 
+**Status: Done**
+
 **Priorität:** Mittel
 **Bereich:** Backend-Schema, Editor, Frontend
 **Spec-Referenz:** https://cooklang.org/docs/spec/
