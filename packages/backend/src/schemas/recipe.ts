@@ -1,10 +1,21 @@
 import { z } from "zod";
 
-export const recipeMetadataSchema = z.object({
-	"time required": z.string().optional(),
-	course: z.string().optional(),
-	servings: z.string().optional(),
-});
+export const recipeMetadataSchema = z
+	.object({
+		"time required": z.string().optional(),
+		course: z.string().optional(),
+		servings: z.string().optional(),
+		tags: z.string().optional(),
+		source: z.string().optional(),
+		author: z.string().optional(),
+		"prep time": z.string().optional(),
+		"cook time": z.string().optional(),
+		difficulty: z.string().optional(),
+		cuisine: z.string().optional(),
+		diet: z.string().optional(),
+		description: z.string().optional(),
+	})
+	.catchall(z.string());
 
 export const recipeSummarySchema = z.object({
 	slug: z.string(),
