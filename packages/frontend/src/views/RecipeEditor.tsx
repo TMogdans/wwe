@@ -42,6 +42,15 @@ const EMPTY_METADATA: RecipeMetadata = {
 	timeRequired: "",
 	course: "",
 	servings: "",
+	tags: "",
+	source: "",
+	author: "",
+	prepTime: "",
+	cookTime: "",
+	difficulty: "",
+	cuisine: "",
+	diet: "",
+	description: "",
 };
 
 function metadataFromRecipe(recipe: RecipeDetail): RecipeMetadata {
@@ -49,6 +58,15 @@ function metadataFromRecipe(recipe: RecipeDetail): RecipeMetadata {
 		timeRequired: recipe.metadata["time required"] ?? "",
 		course: recipe.metadata.course ?? "",
 		servings: recipe.metadata.servings ?? "",
+		tags: recipe.metadata.tags ?? "",
+		source: recipe.metadata.source ?? "",
+		author: recipe.metadata.author ?? "",
+		prepTime: recipe.metadata["prep time"] ?? "",
+		cookTime: recipe.metadata["cook time"] ?? "",
+		difficulty: recipe.metadata.difficulty ?? "",
+		cuisine: recipe.metadata.cuisine ?? "",
+		diet: recipe.metadata.diet ?? "",
+		description: recipe.metadata.description ?? "",
 	};
 }
 
@@ -57,6 +75,15 @@ function metadataToRecord(meta: RecipeMetadata): Record<string, string> {
 	if (meta.timeRequired) record["time required"] = meta.timeRequired;
 	if (meta.course) record.course = meta.course;
 	if (meta.servings) record.servings = meta.servings;
+	if (meta.tags) record.tags = meta.tags;
+	if (meta.source) record.source = meta.source;
+	if (meta.author) record.author = meta.author;
+	if (meta.prepTime) record["prep time"] = meta.prepTime;
+	if (meta.cookTime) record["cook time"] = meta.cookTime;
+	if (meta.difficulty) record.difficulty = meta.difficulty;
+	if (meta.cuisine) record.cuisine = meta.cuisine;
+	if (meta.diet) record.diet = meta.diet;
+	if (meta.description) record.description = meta.description;
 	return record;
 }
 
