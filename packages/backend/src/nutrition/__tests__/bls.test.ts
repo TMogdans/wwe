@@ -58,4 +58,10 @@ describe("suggestBlsFoods", () => {
 
 		expect(results).toEqual([]);
 	});
+
+	test("returns empty array for queries shorter than 2 characters", () => {
+		const results = suggestBlsFoods(db, "x", undefined, 3);
+
+		expect(results).toEqual([]);
+	});
 });

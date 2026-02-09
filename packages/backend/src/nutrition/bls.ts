@@ -85,6 +85,10 @@ export function searchFoods(
 	return stmt.all(`%${query}%`, limit) as BlsFood[];
 }
 
+// Substring match bonus factor: reduces distance by 90% when ingredient is contained in food name
+// This ensures substring matches rank higher than similar-length unrelated words
+const SUBSTRING_MATCH_BONUS = 0.1;
+
 export function suggestBlsFoods(
 	db: DatabaseSync,
 	ingredientName: string,
@@ -94,12 +98,32 @@ export function suggestBlsFoods(
 	const lowerName = ingredientName.toLowerCase();
 	const canonical = synonymMap?.get(lowerName) ?? ingredientName;
 
-	// Fetch all foods
-	const stmt = db.prepare("SELECT code, name_de, name_en FROM foods");
-	const allFoods = stmt.all() as BlsFood[];
+	// Require at least 2 characters for meaningful fuzzy matching
+	if (lowerName.length < 2 && canonical.length < 2) {
+		return [];
+	}
 
-	// Calculate distances
-	const scored = allFoods.map((food) => {
+	// Pre-filter: Get candidates using SQL LIKE to reduce search space
+	// Use first 3 characters (or all if shorter) to find potential matches
+	const searchTerm =
+		canonical.length >= 3 ? canonical.substring(0, 3) : canonical;
+
+	const stmt = db.prepare(
+		"SELECT code, name_de, name_en FROM foods WHERE LOWER(name_de) LIKE ? LIMIT 500",
+	);
+	let candidates = stmt.all(`%${searchTerm}%`) as BlsFood[];
+
+	// If no candidates found and we used synonym, try with original name
+	if (candidates.length === 0 && canonical !== ingredientName) {
+		const altTerm =
+			ingredientName.length >= 3
+				? ingredientName.substring(0, 3)
+				: ingredientName;
+		candidates = stmt.all(`%${altTerm}%`) as BlsFood[];
+	}
+
+	// Calculate distances on the filtered candidate set
+	const scored = candidates.map((food) => {
 		const foodLower = food.name_de.toLowerCase();
 
 		// Distance to original name
@@ -114,13 +138,19 @@ export function suggestBlsFoods(
 		// Bonus for substring matches: if ingredient is a substring of food name,
 		// treat it as a very close match by reducing distance significantly
 		if (foodLower.includes(lowerName)) {
-			distOriginal = Math.min(distOriginal, lowerName.length * 0.1);
+			distOriginal = Math.min(
+				distOriginal,
+				lowerName.length * SUBSTRING_MATCH_BONUS,
+			);
 		}
 		if (
 			canonical !== ingredientName &&
 			foodLower.includes(canonical.toLowerCase())
 		) {
-			distCanonical = Math.min(distCanonical, canonical.length * 0.1);
+			distCanonical = Math.min(
+				distCanonical,
+				canonical.length * SUBSTRING_MATCH_BONUS,
+			);
 		}
 
 		// Use better distance
