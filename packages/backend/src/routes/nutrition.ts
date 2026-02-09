@@ -229,11 +229,22 @@ export function createNutritionRouter(recipesDir: string): Router {
 			// Open database for suggestions
 			const db = openDatabase(dbPath);
 
-			// Build suggestions for each unmapped ingredient
-			const suggestions: SuggestionResponse[] = unmapped.map((ing) => ({
-				ingredient: ing.name,
-				suggestions: suggestBlsFoods(db, ing.name, synonyms, 5),
-				units: [ing.unit],
+			// Group unmapped ingredients by name to collect all unique units
+			const unmappedByName = new Map<string, Set<string>>();
+			for (const ing of unmapped) {
+				if (!unmappedByName.has(ing.name)) {
+					unmappedByName.set(ing.name, new Set());
+				}
+				unmappedByName.get(ing.name)?.add(ing.unit);
+			}
+
+			// Build suggestions with all units per ingredient
+			const suggestions: SuggestionResponse[] = Array.from(
+				unmappedByName.entries(),
+			).map(([name, units]) => ({
+				ingredient: name,
+				suggestions: suggestBlsFoods(db, name, synonyms, 5),
+				units: Array.from(units),
 			}));
 
 			res.json(suggestions);
