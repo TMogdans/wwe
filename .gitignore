@@ -7,3 +7,4 @@ data/
 rezepte/bls.sqlite
 rezepte/bls.sqlite-shm
 rezepte/bls.sqlite-wal
+.worktrees/
