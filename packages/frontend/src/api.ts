@@ -117,6 +117,24 @@ export interface NutritionData {
 	coverage: number;
 }
 
+export interface BlsFood {
+	code: string;
+	name_de: string;
+	name_en: string | null;
+}
+
+export interface IngredientSuggestion {
+	ingredient: string;
+	suggestions: BlsFood[];
+	units: string[];
+}
+
+export interface CreateMappingRequest {
+	ingredientName: string;
+	blsCode: string;
+	gramsPer?: Record<string, number>;
+}
+
 export async function fetchNutrition(
 	slug: string,
 	servings?: number,
@@ -128,6 +146,25 @@ export async function fetchNutrition(
 	if (res.status === 503) return null; // BLS DB not available
 	if (!res.ok) throw new Error("Failed to fetch nutrition");
 	return res.json();
+}
+
+export async function getNutritionSuggestions(
+	slug: string,
+): Promise<IngredientSuggestion[]> {
+	const response = await fetch(`/api/naehrwerte/${slug}/suggestions`);
+	if (!response.ok) throw new Error("Failed to fetch suggestions");
+	return response.json();
+}
+
+export async function createMapping(
+	request: CreateMappingRequest,
+): Promise<void> {
+	const response = await fetch("/api/naehrwerte/mapping", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(request),
+	});
+	if (!response.ok) throw new Error("Failed to save mapping");
 }
 
 export async function generateShoppingList(
