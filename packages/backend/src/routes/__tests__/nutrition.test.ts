@@ -149,4 +149,39 @@ describe("nutrition routes", () => {
 		expect(res.status).toBe(200);
 		expect(res.body.coverage).toBe(0);
 	});
+
+	describe("GET /:slug/suggestions", () => {
+		it("returns suggestions for unmapped ingredients", async () => {
+			const res = await request(app).get(
+				"/api/naehrwerte/Test%20Rezept/suggestions",
+			);
+			expect(res.status).toBe(200);
+
+			expect(res.body).toBeInstanceOf(Array);
+			if (res.body.length > 0) {
+				expect(res.body[0]).toHaveProperty("ingredient");
+				expect(res.body[0]).toHaveProperty("suggestions");
+				expect(res.body[0]).toHaveProperty("units");
+			}
+		});
+
+		it("returns 404 for non-existent recipe", async () => {
+			const res = await request(app).get(
+				"/api/naehrwerte/nonexistent/suggestions",
+			);
+			expect(res.status).toBe(404);
+		});
+
+		it("returns 503 when BLS database not available", async () => {
+			// Remove BLS database
+			const { unlink } = await import("node:fs/promises");
+			await unlink(path.join(tempDir, "bls.sqlite"));
+
+			const res = await request(app).get(
+				"/api/naehrwerte/Test%20Rezept/suggestions",
+			);
+			expect(res.status).toBe(503);
+			expect(res.body).toHaveProperty("error");
+		});
+	});
 });
