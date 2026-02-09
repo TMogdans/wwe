@@ -184,4 +184,76 @@ describe("nutrition routes", () => {
 			expect(res.body).toHaveProperty("error");
 		});
 	});
+
+	describe("POST /mapping", () => {
+		it("creates new mapping", async () => {
+			const { readFile } = await import("node:fs/promises");
+
+			const response = await request(app)
+				.post("/api/naehrwerte/mapping")
+				.send({
+					ingredientName: "Paprika",
+					blsCode: "G480100",
+				})
+				.expect(200);
+
+			expect(response.body).toHaveProperty("success", true);
+
+			const content = await readFile(
+				path.join(tempDir, "naehrwerte-mapping.json"),
+				"utf-8",
+			);
+			const mapping = JSON.parse(content);
+			expect(mapping.Paprika).toEqual({ code: "G480100" });
+		});
+
+		it("adds mapping with gramsPer", async () => {
+			const { readFile } = await import("node:fs/promises");
+
+			await request(app)
+				.post("/api/naehrwerte/mapping")
+				.send({
+					ingredientName: "Zwiebel",
+					blsCode: "G480200",
+					gramsPer: { Stueck: 150 },
+				})
+				.expect(200);
+
+			const content = await readFile(
+				path.join(tempDir, "naehrwerte-mapping.json"),
+				"utf-8",
+			);
+			const mapping = JSON.parse(content);
+			expect(mapping.Zwiebel).toEqual({
+				code: "G480200",
+				gramsPer: { Stueck: 150 },
+			});
+		});
+
+		it("sorts mappings alphabetically", async () => {
+			const { readFile } = await import("node:fs/promises");
+
+			await request(app)
+				.post("/api/naehrwerte/mapping")
+				.send({
+					ingredientName: "Apfel",
+					blsCode: "O100",
+				})
+				.expect(200);
+
+			const content = await readFile(
+				path.join(tempDir, "naehrwerte-mapping.json"),
+				"utf-8",
+			);
+			const keys = Object.keys(JSON.parse(content));
+			expect(keys).toEqual(["Apfel", "Hackfleisch", "Zwiebeln"]);
+		});
+
+		it("validates request body", async () => {
+			await request(app)
+				.post("/api/naehrwerte/mapping")
+				.send({ ingredientName: "" })
+				.expect(400);
+		});
+	});
 });

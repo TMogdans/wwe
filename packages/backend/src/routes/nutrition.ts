@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Router } from "express";
 import { openDatabase, suggestBlsFoods } from "../nutrition/bls.js";
@@ -10,6 +10,7 @@ import {
 } from "../nutrition/calculator.js";
 import { parseRecipe } from "../parser/index.js";
 import type { CooklangIngredient } from "../parser/types.js";
+import { createMappingSchema } from "../schemas/nutrition.js";
 import type { SuggestionResponse } from "../schemas/nutrition.js";
 import { type SynonymMap, buildSynonymMap } from "../schemas/shopping-list.js";
 
@@ -251,6 +252,52 @@ export function createNutritionRouter(recipesDir: string): Router {
 		} catch (error) {
 			console.error("Error generating suggestions:", error);
 			res.status(500).json({ error: "Failed to generate suggestions" });
+		}
+	});
+
+	// POST /mapping – create a new ingredient mapping
+	router.post("/mapping", async (req, res) => {
+		try {
+			// Validate request
+			const parsed = createMappingSchema.safeParse(req.body);
+			if (!parsed.success) {
+				return res.status(400).json({ error: "Invalid request body" });
+			}
+
+			const { ingredientName, blsCode, gramsPer } = parsed.data;
+
+			// Load current mapping
+			const mappingPath = path.join(recipesDir, MAPPING_FILE);
+			let mapping: MappingConfig = {};
+			try {
+				const raw = await readFile(mappingPath, "utf-8");
+				mapping = JSON.parse(raw);
+			} catch {
+				// No mapping file – start with empty mapping
+			}
+
+			// Add new mapping
+			mapping[ingredientName] = gramsPer
+				? { code: blsCode, gramsPer }
+				: { code: blsCode };
+
+			// Sort alphabetically
+			const sorted = Object.keys(mapping)
+				.sort()
+				.reduce((acc, key) => {
+					acc[key] = mapping[key];
+					return acc;
+				}, {} as MappingConfig);
+
+			// Atomic write: temp file + rename
+			const tempPath = `${mappingPath}.tmp`;
+			await writeFile(tempPath, JSON.stringify(sorted, null, 2), "utf-8");
+			await rename(tempPath, mappingPath);
+
+			res.json({ success: true });
+		} catch (error) {
+			console.error("Error saving mapping:", error);
+			res.status(500).json({ error: "Failed to save mapping" });
 		}
 	});
 
