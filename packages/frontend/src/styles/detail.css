@@ -260,3 +260,67 @@
 	color: #dc2626;
 	font-size: 1rem;
 }
+
+/* Nutrition table */
+.nutrition {
+	margin-top: 0.5rem;
+}
+
+.nutrition-coverage {
+	font-size: 0.875rem;
+	color: #78716c;
+	margin-bottom: 1rem;
+	padding: 0.5rem 0.75rem;
+	background: var(--color-bg);
+	border-radius: var(--radius);
+}
+
+.nutrition-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9375rem;
+}
+
+.nutrition-table th {
+	text-align: left;
+	padding: 0.5rem 0;
+	border-bottom: 2px solid var(--color-border);
+	font-weight: 600;
+	font-size: 0.8125rem;
+	color: #78716c;
+	text-transform: uppercase;
+	letter-spacing: 0.025em;
+}
+
+.nutrition-table td {
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.nutrition-table tr:last-child td {
+	border-bottom: none;
+}
+
+.nutrition-table th:not(:first-child),
+.nutrition-table td:not(:first-child) {
+	text-align: right;
+}
+
+.nutrition-unmapped {
+	margin-top: 1rem;
+	font-size: 0.875rem;
+	color: #78716c;
+}
+
+.nutrition-unmapped summary {
+	cursor: pointer;
+}
+
+.nutrition-unmapped ul {
+	margin-top: 0.5rem;
+	padding-left: 1.25rem;
+}
+
+.nutrition-unmapped li {
+	padding: 0.125rem 0;
+}

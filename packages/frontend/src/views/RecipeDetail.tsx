@@ -1,8 +1,14 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useEffect, useState } from "react";
-import { type RecipeDetail as RecipeDetailType, fetchRecipe } from "../api.js";
+import {
+	type NutritionData,
+	type RecipeDetail as RecipeDetailType,
+	fetchNutrition,
+	fetchRecipe,
+} from "../api.js";
 import { EquipmentList } from "../components/EquipmentList.js";
 import { IngredientList } from "../components/IngredientList.js";
+import { NutritionTable } from "../components/NutritionTable.js";
 import { PortionCalculator } from "../components/PortionCalculator.js";
 import { StepList } from "../components/StepList.js";
 import "../styles/detail.css";
@@ -21,11 +27,13 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 	const [recipe, setRecipe] = useState<RecipeDetailType | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [servings, setServings] = useState<number | null>(null);
+	const [nutrition, setNutrition] = useState<NutritionData | null>(null);
 
 	useEffect(() => {
 		setRecipe(null);
 		setError(null);
 		setServings(null);
+		setNutrition(null);
 		fetchRecipe(slug)
 			.then((data) => {
 				setRecipe(data);
@@ -33,6 +41,13 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 			})
 			.catch(() => setError("Rezept konnte nicht geladen werden."));
 	}, [slug]);
+
+	useEffect(() => {
+		if (!recipe || servings === null) return;
+		fetchNutrition(slug, servings)
+			.then(setNutrition)
+			.catch(() => {});
+	}, [slug, recipe, servings]);
 
 	if (error) {
 		return (
@@ -130,6 +145,9 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 					<Tabs.Trigger value="zubereitung" className="detail-tab-trigger">
 						Zubereitung
 					</Tabs.Trigger>
+					<Tabs.Trigger value="naehrwerte" className="detail-tab-trigger">
+						Naehrwerte
+					</Tabs.Trigger>
 				</Tabs.List>
 
 				<Tabs.Content value="zutaten">
@@ -147,6 +165,14 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 
 				<Tabs.Content value="zubereitung">
 					<StepList sections={recipe.sections} scale={scale} />
+				</Tabs.Content>
+
+				<Tabs.Content value="naehrwerte">
+					{nutrition ? (
+						<NutritionTable data={nutrition} />
+					) : (
+						<p className="detail-loading">Lade Naehrwerte...</p>
+					)}
 				</Tabs.Content>
 			</Tabs.Root>
 

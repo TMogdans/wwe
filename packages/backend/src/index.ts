@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import { createCategoriesRouter } from "./routes/categories.js";
+import { createNutritionRouter } from "./routes/nutrition.js";
 import { createRecipeRouter } from "./routes/recipes.js";
 import { createShoppingListRouter } from "./routes/shopping-list.js";
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use("/api/kategorien", createCategoriesRouter(recipesDir));
 app.use("/api/rezepte", createRecipeRouter(recipesDir));
 app.use("/api/einkaufsliste", createShoppingListRouter(recipesDir));
+app.use("/api/naehrwerte", createNutritionRouter(recipesDir));
 
 // Serve frontend in production
 if (process.env.NODE_ENV === "production") {

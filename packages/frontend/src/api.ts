@@ -92,6 +92,44 @@ export async function fetchCourses(): Promise<string[]> {
 	return res.json();
 }
 
+export interface NutrientEntry {
+	code: string;
+	name: string;
+	value: number;
+	unit: string;
+}
+
+export interface NutritionIngredient {
+	name: string;
+	amount: string;
+	unit: string;
+	grams: number | null;
+	blsCode: string | null;
+	blsName: string | null;
+	matched: boolean;
+}
+
+export interface NutritionData {
+	servings: number;
+	perServing: NutrientEntry[];
+	total: NutrientEntry[];
+	ingredients: NutritionIngredient[];
+	coverage: number;
+}
+
+export async function fetchNutrition(
+	slug: string,
+	servings?: number,
+): Promise<NutritionData | null> {
+	const params = servings ? `?servings=${servings}` : "";
+	const res = await fetch(
+		`/api/naehrwerte/${encodeURIComponent(slug)}${params}`,
+	);
+	if (res.status === 503) return null; // BLS DB not available
+	if (!res.ok) throw new Error("Failed to fetch nutrition");
+	return res.json();
+}
+
 export async function generateShoppingList(
 	slugs: Array<string | { slug: string; servings?: number }>,
 ): Promise<AggregatedIngredient[]> {

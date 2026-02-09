@@ -1,0 +1,65 @@
+{
+	"Zwiebeln": {
+		"code": "G480100",
+		"gramsPer": { "Stück": 150 }
+	},
+	"Knoblauch": {
+		"code": "G490100",
+		"gramsPer": { "Zehen": 3, "Zehe": 3 }
+	},
+	"Öl": {
+		"code": "Q320000",
+		"gramsPer": { "EL": 10, "TL": 5 }
+	},
+	"Hackfleisch": {
+		"code": "U010100"
+	},
+	"Zucker": {
+		"code": "S111000",
+		"gramsPer": { "Priese": 0.5, "Prise": 0.5 }
+	},
+	"Tomatenmark": {
+		"code": "R160000",
+		"gramsPer": { "EL": 15, "TL": 5 }
+	},
+	"Rotwein": {
+		"code": "P2A3000"
+	},
+	"Kaffee": {
+		"code": "N410100",
+		"gramsPer": { "Tasse": 250 }
+	},
+	"Kakao": {
+		"code": "S713000",
+		"gramsPer": { "EL": 8, "TL": 3 }
+	},
+	"Tomaten, stückig": {
+		"code": "G560900",
+		"gramsPer": { "Dosen": 400, "Dose": 400 }
+	},
+	"Tomaten": {
+		"code": "G561100",
+		"gramsPer": { "Stück": 120 }
+	},
+	"Chilischote": {
+		"code": "G553100",
+		"gramsPer": { "Stück": 15 }
+	},
+	"Mais": {
+		"code": "G570902",
+		"gramsPer": { "Dose": 285 }
+	},
+	"Kidneybohnen": {
+		"code": "H742902",
+		"gramsPer": { "Dose": 255 }
+	},
+	"Salz": {
+		"code": "R111000"
+	},
+	"Brühepulver": {
+		"code": "R811000"
+	},
+	"Pfeffer": {
+		"code": "R258100"
+	}
+}
