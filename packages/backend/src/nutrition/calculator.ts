@@ -1,5 +1,6 @@
 import type { DatabaseSync } from "node:sqlite";
 import type { CooklangIngredient } from "../parser/types.js";
+import type { SynonymMap } from "../schemas/shopping-list.js";
 import { type NutrientValue, getFood, getNutrients } from "./bls.js";
 
 export interface IngredientMapping {
@@ -105,7 +106,7 @@ export function calculateRecipeNutrition(
 	let matchedCount = 0;
 
 	for (const ingredient of ingredients) {
-		const ingredientMapping = findMapping(ingredient.name, mapping);
+		const ingredientMapping = findMapping(ingredient.name, mapping, undefined);
 		const grams = ingredientMapping
 			? convertToGrams(ingredient.amount, ingredient.unit, ingredientMapping)
 			: null;
@@ -178,17 +179,34 @@ export function calculateRecipeNutrition(
 	};
 }
 
-function findMapping(
+export function findMapping(
 	ingredientName: string,
 	mapping: MappingConfig,
+	synonymMap?: SynonymMap,
 ): IngredientMapping | null {
-	// Exact match first
+	// 1. Exact match
 	if (mapping[ingredientName]) return mapping[ingredientName];
 
-	// Case-insensitive match
+	// 2. Case-insensitive match
 	const lowerName = ingredientName.toLowerCase();
 	for (const [key, value] of Object.entries(mapping)) {
 		if (key.toLowerCase() === lowerName) return value;
+	}
+
+	// 3. Synonym lookup → exact match
+	if (synonymMap) {
+		const canonical = synonymMap.get(lowerName);
+		if (canonical && mapping[canonical]) {
+			return mapping[canonical];
+		}
+
+		// 4. Synonym lookup → case-insensitive match
+		if (canonical) {
+			const canonicalLower = canonical.toLowerCase();
+			for (const [key, value] of Object.entries(mapping)) {
+				if (key.toLowerCase() === canonicalLower) return value;
+			}
+		}
 	}
 
 	return null;

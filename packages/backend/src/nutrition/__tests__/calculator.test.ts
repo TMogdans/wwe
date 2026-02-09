@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import type { CooklangIngredient } from "../../parser/types.js";
+import { buildSynonymMap } from "../../schemas/shopping-list.js";
 import {
 	type MappingConfig,
 	type NutrientConfig,
 	convertToGrams,
+	findMapping,
 } from "../calculator.js";
 
 describe("convertToGrams", () => {
@@ -67,5 +69,38 @@ describe("convertToGrams", () => {
 
 	it("handles decimal comma", () => {
 		expect(convertToGrams("1,5", "kg")).toBe(1500);
+	});
+});
+
+describe("findMapping with synonyms", () => {
+	test("finds mapping via synonym", () => {
+		const mapping: MappingConfig = {
+			Sahne: { code: "M010100" },
+		};
+		const synonymMap = buildSynonymMap([["Sahne", "Schlagsahne", "Obers"]]);
+
+		const result = findMapping("Schlagsahne", mapping, synonymMap);
+		expect(result).toEqual({ code: "M010100" });
+	});
+
+	test("prefers exact match over synonym", () => {
+		const mapping: MappingConfig = {
+			Sahne: { code: "M010100" },
+			Schlagsahne: { code: "M020200" },
+		};
+		const synonymMap = buildSynonymMap([["Sahne", "Schlagsahne"]]);
+
+		const result = findMapping("Schlagsahne", mapping, synonymMap);
+		expect(result).toEqual({ code: "M020200" });
+	});
+
+	test("returns null when no match found", () => {
+		const mapping: MappingConfig = {
+			Sahne: { code: "M010100" },
+		};
+		const synonymMap = buildSynonymMap([["Sahne", "Schlagsahne"]]);
+
+		const result = findMapping("Unbekannt", mapping, synonymMap);
+		expect(result).toBeNull();
 	});
 });
