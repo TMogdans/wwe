@@ -188,7 +188,9 @@ function UnmappedIngredients({
 								onClick={() => handleSave(suggestion.ingredient)}
 								disabled={
 									!selectedCodes.has(suggestion.ingredient) ||
-									saving.has(suggestion.ingredient)
+									saving.has(suggestion.ingredient) ||
+									(hasNonMetricUnits(suggestion.units) &&
+										!gramsPerInputs.has(suggestion.ingredient))
 								}
 								className="save-mapping-btn"
 							>
