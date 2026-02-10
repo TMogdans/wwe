@@ -1,5 +1,5 @@
-# Build Stage
-FROM node:22-alpine AS build
+# Build Stage - use host architecture (x86_64) for building
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 WORKDIR /app
 
 # Enable pnpm
