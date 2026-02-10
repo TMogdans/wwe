@@ -176,6 +176,12 @@ function UnmappedIngredients({
 															[suggestion.units[0]]: value,
 														}),
 													);
+												} else {
+													setGramsPerInputs((prev) => {
+														const next = new Map(prev);
+														next.delete(suggestion.ingredient);
+														return next;
+													});
 												}
 											}}
 										/>
