@@ -87,10 +87,25 @@ Die `docker-compose.prod.yml` auf den Raspi kopieren (vom Mac aus):
 scp docker-compose.prod.yml pi@rezepte.fritz.box:~/wwe/docker-compose.yml
 ```
 
-Die Rezepte ruebersynchen (vom Mac aus):
+Die Rezepte und Konfiguration ruebersynchen (vom Mac aus):
 ```bash
 scp rezepte/*.cook pi@rezepte.fritz.box:~/wwe/rezepte/
+scp rezepte/kategorien.json pi@rezepte.fritz.box:~/wwe/rezepte/
 ```
+
+### Naehrwertdaten (optional)
+
+Fuer Naehrwertanzeige muessen die BLS-Datenbank und Konfigurationsdateien auf den Raspi:
+
+```bash
+scp rezepte/bls.sqlite pi@rezepte.fritz.box:~/wwe/rezepte/
+scp rezepte/naehrwerte.json pi@rezepte.fritz.box:~/wwe/rezepte/
+scp rezepte/naehrwerte-mapping.json pi@rezepte.fritz.box:~/wwe/rezepte/
+```
+
+Die `bls.sqlite` ist ca. 45 MB gross. Ohne diese Datei funktioniert die App normal, nur der Naehrwerte-Tab zeigt keine Daten.
+
+Falls die BLS-Datenbank noch nicht existiert, auf dem Mac zuerst importieren (siehe README).
 
 Auf dem Raspi starten:
 ```bash
@@ -106,6 +121,12 @@ Wenn du Aenderungen auf `main` pushst, baut GitHub Actions automatisch ein neues
 cd ~/wwe
 docker compose pull
 docker compose up -d
+```
+
+Rezepte und Mappings aktualisieren (vom Mac aus):
+```bash
+scp rezepte/*.cook pi@rezepte.fritz.box:~/wwe/rezepte/
+scp rezepte/naehrwerte-mapping.json pi@rezepte.fritz.box:~/wwe/rezepte/
 ```
 
 ## Fertig

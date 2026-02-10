@@ -11,6 +11,7 @@ Lokale Rezeptdatenbank mit [Cooklang](https://cooklang.org/)-Support. Rezepte we
 - Portionenrechner mit automatischer Skalierung
 - Suche und Filterung nach Kategorie/Gang
 - Konfigurierbare Kategorien ueber `kategorien.json`
+- Naehrwertdaten via BLS 4.0 (Bundeslebensmittelschluessel)
 
 ## Tech Stack
 
@@ -96,3 +97,52 @@ Die Datei `rezepte/kategorien.json` definiert die verfuegbaren Gaenge:
 ```
 
 Neue Kategorien einfach ans Array anfuegen — kein Rebuild noetig.
+
+## Naehrwertdaten (BLS 4.0)
+
+Die App kann Naehrwerte pro Rezept berechnen. Datenquelle ist der [Bundeslebensmittelschluessel (BLS) 4.0](https://www.openagrar.de/receive/openagrar_mods_00112643) (CC BY 4.0, 7.140 Lebensmittel, 138 Naehrstoffe).
+
+### 1. BLS-Datenbank importieren
+
+CSV herunterladen von OpenAgrar und importieren:
+
+```bash
+npx tsx packages/backend/src/scripts/import-bls.ts data/BLS_4_0_Daten_2025_DE.csv
+```
+
+Das erzeugt `rezepte/bls.sqlite` (~45 MB). Die Datei muss im `rezepte/`-Verzeichnis liegen (bzw. im gemounteten Volume auf dem Raspi).
+
+### 2. Naehrstoffe konfigurieren
+
+`rezepte/naehrwerte.json` legt fest, welche Naehrstoffe angezeigt werden:
+
+```json
+{
+  "nutrients": ["ENERCC", "PROT625", "FAT", "CHO", "FIBT", "SUGAR", "FASAT", "FAMS", "FAPU", "CHORL", "NA", "NACL"]
+}
+```
+
+Die Codes sind BLS-Naehrstoffcodes. Namen und Einheiten kommen automatisch aus der Datenbank. Codes hinzufuegen oder entfernen — kein Rebuild noetig.
+
+### 3. Zutaten mappen
+
+`rezepte/naehrwerte-mapping.json` ordnet Rezept-Zutaten den BLS-Eintraegen zu:
+
+```json
+{
+  "Hackfleisch": {
+    "code": "U010100"
+  },
+  "Zwiebeln": {
+    "code": "G480100",
+    "gramsPer": { "Stueck": 150 }
+  }
+}
+```
+
+- `code` — BLS-Code des Lebensmittels
+- `gramsPer` — optional: Gewicht pro Einheit fuer nicht-metrische Units (z.B. Stueck, Zehen, Dose)
+
+Standard-Einheiten (g, kg, ml, l, EL, TL, Prise, Tasse, Dose) werden automatisch umgerechnet. `gramsPer` ueberschreibt die Defaults pro Zutat.
+
+Nicht gemappte Zutaten werden im Frontend als "Nicht erfasst" angezeigt. Die Coverage zeigt an, wie viel Prozent der Zutaten erfasst sind.
