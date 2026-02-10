@@ -1,0 +1,67 @@
+.theme-toggle {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	z-index: 1000;
+
+	display: flex;
+	align-items: center;
+	gap: 8px;
+
+	padding: 12px 16px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	background: var(--color-surface);
+	color: var(--color-text);
+
+	font-family: var(--font-base);
+	font-size: 14px;
+	font-weight: 500;
+
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle:active {
+	transform: translateY(0);
+}
+
+.theme-toggle:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+	font-size: 18px;
+	line-height: 1;
+}
+
+.theme-toggle__label {
+	text-transform: capitalize;
+	user-select: none;
+}
+
+@media (max-width: 640px) {
+	.theme-toggle {
+		bottom: 16px;
+		right: 16px;
+		padding: 10px 12px;
+	}
+
+	.theme-toggle__label {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.theme-toggle {
+		transition: none;
+	}
+}
