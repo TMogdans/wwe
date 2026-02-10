@@ -1,13 +1,4 @@
 :root {
-	--color-bg: #fafaf9;
-	--color-text: #1c1917;
-	--color-ingredient: #ea580c;
-	--color-equipment: #2563eb;
-	--color-timer: #059669;
-	--color-comment: #78716c;
-	--color-border: #d6d3d1;
-	--color-surface: #ffffff;
-	--color-primary: #ea580c;
 	--radius: 8px;
 	--font-base: system-ui, -apple-system, sans-serif;
 }

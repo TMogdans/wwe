@@ -1,0 +1,79 @@
+/* Light theme tokens */
+:root {
+	--color-bg-light: #fafaf9;
+	--color-text-light: #1c1917;
+	--color-ingredient-light: #ea580c;
+	--color-equipment-light: #2563eb;
+	--color-timer-light: #059669;
+	--color-comment-light: #78716c;
+	--color-border-light: #d6d3d1;
+	--color-surface-light: #ffffff;
+	--color-primary-light: #ea580c;
+}
+
+/* Dark theme tokens */
+:root {
+	--color-bg-dark: #1c1917;
+	--color-text-dark: #fafaf9;
+	--color-ingredient-dark: #fb923c;
+	--color-equipment-dark: #60a5fa;
+	--color-timer-dark: #34d399;
+	--color-comment-dark: #a8a29e;
+	--color-border-dark: #44403c;
+	--color-surface-dark: #292524;
+	--color-primary-dark: #fb923c;
+}
+
+/* Theme application */
+:root,
+:root[data-theme="light"] {
+	--color-bg: var(--color-bg-light);
+	--color-surface: var(--color-surface-light);
+	--color-text: var(--color-text-light);
+	--color-border: var(--color-border-light);
+	--color-ingredient: var(--color-ingredient-light);
+	--color-equipment: var(--color-equipment-light);
+	--color-timer: var(--color-timer-light);
+	--color-comment: var(--color-comment-light);
+	--color-primary: var(--color-primary-light);
+}
+
+:root[data-theme="dark"] {
+	--color-bg: var(--color-bg-dark);
+	--color-surface: var(--color-surface-dark);
+	--color-text: var(--color-text-dark);
+	--color-border: var(--color-border-dark);
+	--color-ingredient: var(--color-ingredient-dark);
+	--color-equipment: var(--color-equipment-dark);
+	--color-timer: var(--color-timer-dark);
+	--color-comment: var(--color-comment-dark);
+	--color-primary: var(--color-primary-dark);
+}
+
+/* System preference fallback */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		--color-bg: var(--color-bg-dark);
+		--color-surface: var(--color-surface-dark);
+		--color-text: var(--color-text-dark);
+		--color-border: var(--color-border-dark);
+		--color-ingredient: var(--color-ingredient-dark);
+		--color-equipment: var(--color-equipment-dark);
+		--color-timer: var(--color-timer-dark);
+		--color-comment: var(--color-comment-dark);
+		--color-primary: var(--color-primary-dark);
+	}
+}
+
+/* Smooth transitions (respecting reduced-motion preference) */
+@media (prefers-reduced-motion: no-preference) {
+	body,
+	button,
+	input,
+	textarea,
+	select,
+	a {
+		transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s
+			ease;
+	}
+}
