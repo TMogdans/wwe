@@ -169,7 +169,7 @@ export function RecipeDetail({ slug }: RecipeDetailProps) {
 
 				<Tabs.Content value="naehrwerte">
 					{nutrition ? (
-						<NutritionTable data={nutrition} />
+						<NutritionTable data={nutrition} slug={slug} />
 					) : (
 						<p className="detail-loading">Lade Naehrwerte...</p>
 					)}
