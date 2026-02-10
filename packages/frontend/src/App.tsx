@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./styles/global.css";
+import { ThemeToggle } from "./components/ThemeToggle.js";
 import { CookMode } from "./views/CookMode.js";
 import { RecipeDetail } from "./views/RecipeDetail.js";
 import { RecipeEditor } from "./views/RecipeEditor.js";
@@ -20,6 +21,15 @@ function useHashRoute() {
 export function App() {
 	const route = useHashRoute();
 
+	return (
+		<>
+			<ThemeToggle />
+			{renderRoute(route)}
+		</>
+	);
+}
+
+function renderRoute(route: string) {
 	if (route === "/" || route === "") {
 		return <RecipeOverview />;
 	}
