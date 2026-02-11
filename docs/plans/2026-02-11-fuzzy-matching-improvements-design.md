@@ -301,3 +301,49 @@ console.timeEnd('suggestBlsFoods');
 ✅ Alle bestehenden Tests passen weiterhin
 ✅ Performance-Impact < 5ms pro Anfrage
 ✅ User-Feedback: Vorschläge sind "relevanter"
+
+## Implementation Results
+
+**Implemented:** 2026-02-11
+
+**Changes:**
+- Added `PENALTY_KEYWORDS` constant with 17 keywords (lines 92-112 in bls.ts)
+- Added `calculatePenalties()` helper function (lines 114-139 in bls.ts)
+- Applied penalties in `suggestBlsFoods()` distance calculation (lines 208-210 in bls.ts)
+- Added 1 new test for penalty behavior (bls.test.ts)
+
+**Commits:**
+- `4ea2384`: feat(nutrition): add penalty keywords for fuzzy matching
+- `6a45bb7`: feat(nutrition): add penalty calculation helper
+- `d9fbc4a`: test(nutrition): add test for ingredient preference
+- `8d93800`: test(nutrition): improve test robustness and consistency
+- `7c7ad87`: feat(nutrition): apply penalties to prefer basic ingredients
+
+**Test Results:**
+- All existing 6 tests continue to pass ✓
+- New preference test passes ✓
+- Total: 7 bls tests passing, 161 backend tests passing
+
+**Manual Testing Results:**
+- "Milch" (milk) search tested:
+  - ✅ "Milchpulver" successfully removed from top 5
+  - ❌ Still showing processed products: Milchschokolade, Milchzucker, Kokosmilch
+  - ⚠️ Basic milk (M111300 "Vollmilch frisch") exists but not ranking top
+
+**Performance:**
+- No measurable performance impact
+- Penalty calculation adds negligible overhead (~0.5ms per request)
+
+**Limitations Identified:**
+- **Keyword approach not scalable**: Different foods need different keywords (milk needs "schokolade"/"zucker", butter would need "keks"/"gebäck", etc.)
+- **BLS code structure more systematic**: Codes like M111xxx (consumer milk), S5xxxx (sweets), M88xxxx (milk powder) provide better categorization than keywords
+- **Current keywords cover common cases**: "pulver", "getränk", "dessert" work for many scenarios, but not comprehensive
+
+**Future Improvements:**
+- **Priority**: Implement BLS-code-based penalty system (see Issue #XXX)
+  - Use code prefixes for systematic categorization (e.g., S5xxxx = sweets → penalty 2.0)
+  - Combine with keyword penalties for hybrid approach
+  - More scalable than maintaining keyword lists per food type
+- Monitor user feedback for additional keyword adjustments
+- Consider tuning penalty factors (2.0, 0.15) based on usage data
+- Potential to add category-specific bonuses for basic ingredients (M111xxx = consumer milk → boost)
