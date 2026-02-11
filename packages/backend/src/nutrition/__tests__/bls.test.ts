@@ -18,7 +18,10 @@ beforeAll(() => {
 			('G480200', 'Paprikaschote, gelb, roh', 'Yellow bell pepper, raw'),
 			('G480300', 'Paprikaschote, grün, roh', 'Green bell pepper, raw'),
 			('M010100', 'Sahne, 30% Fett', 'Cream, 30% fat'),
-			('U010100', 'Rinderhackfleisch', 'Ground beef');
+			('U010100', 'Rinderhackfleisch', 'Ground beef'),
+			('M020200', 'Milchpulver', 'Milk powder'),
+			('M020300', 'Milchmischgetränk', 'Milk mixed drink'),
+			('M020100', 'Vollmilch frisch', 'Whole milk fresh');
 	`);
 });
 
@@ -63,5 +66,33 @@ describe("suggestBlsFoods", () => {
 		const results = suggestBlsFoods(db, "x", undefined, 3);
 
 		expect(results).toEqual([]);
+	});
+
+	test("prefers basic ingredients over processed foods", () => {
+		const suggestions = suggestBlsFoods(db, "Milch", undefined, 10);
+
+		expect(suggestions.length).toBeGreaterThan(0);
+
+		// Check that basic milk products appear before processed ones
+		const basicMilkIndex = suggestions.findIndex((food) =>
+			food.name_de.match(/^(Voll)?[Mm]ilch.*frisch/),
+		);
+		const milkPowderIndex = suggestions.findIndex((food) =>
+			food.name_de.toLowerCase().includes("milchpulver"),
+		);
+		const milkDrinkIndex = suggestions.findIndex((food) =>
+			food.name_de.toLowerCase().includes("milchmischgetränk"),
+		);
+
+		// Basic milk should appear, and if processed products appear, they should rank lower
+		expect(basicMilkIndex).toBeGreaterThanOrEqual(0);
+
+		if (milkPowderIndex >= 0) {
+			expect(basicMilkIndex).toBeLessThan(milkPowderIndex);
+		}
+
+		if (milkDrinkIndex >= 0) {
+			expect(basicMilkIndex).toBeLessThan(milkDrinkIndex);
+		}
 	});
 });
