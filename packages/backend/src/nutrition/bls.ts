@@ -111,6 +111,33 @@ const PENALTY_KEYWORDS = [
 	"angereichert", // enriched
 ];
 
+/**
+ * Calculate penalties for a BLS food name based on keywords and complexity
+ * @param foodName - The name of the BLS food entry
+ * @returns Object with keyword and complexity penalty factors (1.0 = no penalty)
+ */
+function calculatePenalties(foodName: string): {
+	keyword: number;
+	complexity: number;
+} {
+	const lower = foodName.toLowerCase();
+
+	// Keyword penalty: 2.0x if food contains processed/complex keywords
+	const hasKeyword = PENALTY_KEYWORDS.some((kw) => lower.includes(kw));
+	const keywordPenalty = hasKeyword ? 2.0 : 1.0;
+
+	// Complexity penalty: more words = more processed/specific
+	// Split on spaces, commas, slashes
+	const wordCount = foodName
+		.split(/[\s,/]+/)
+		.filter((w) => w.length > 0).length;
+
+	// No penalty for 1-2 words, +15% per additional word
+	const complexityPenalty = wordCount > 2 ? 1.0 + (wordCount - 2) * 0.15 : 1.0;
+
+	return { keyword: keywordPenalty, complexity: complexityPenalty };
+}
+
 export function suggestBlsFoods(
 	db: DatabaseSync,
 	ingredientName: string,
