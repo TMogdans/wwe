@@ -340,7 +340,7 @@ console.timeEnd('suggestBlsFoods');
 - **Current keywords cover common cases**: "pulver", "getränk", "dessert" work for many scenarios, but not comprehensive
 
 **Future Improvements:**
-- **Priority**: Implement BLS-code-based penalty system (see Issue #XXX)
+- **Priority**: Implement BLS-code-based penalty system (see Issue #018)
   - Use code prefixes for systematic categorization (e.g., S5xxxx = sweets → penalty 2.0)
   - Combine with keyword penalties for hybrid approach
   - More scalable than maintaining keyword lists per food type
