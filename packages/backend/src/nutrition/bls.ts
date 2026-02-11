@@ -203,7 +203,11 @@ export function suggestBlsFoods(
 		}
 
 		// Use better distance
-		const bestDist = Math.min(distOriginal, distCanonical);
+		let bestDist = Math.min(distOriginal, distCanonical);
+
+		// Apply penalties for processed/complex foods
+		const penalties = calculatePenalties(food.name_de);
+		bestDist = bestDist * penalties.keyword * penalties.complexity;
 
 		return { food, distance: bestDist };
 	});
