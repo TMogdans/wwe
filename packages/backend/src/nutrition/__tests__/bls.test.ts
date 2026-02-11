@@ -73,10 +73,13 @@ describe("suggestBlsFoods", () => {
 
 		expect(suggestions.length).toBeGreaterThan(0);
 
-		// Check that basic milk products appear before processed ones
-		const basicMilkIndex = suggestions.findIndex((food) =>
-			food.name_de.match(/^(Voll)?[Mm]ilch.*frisch/),
-		);
+		// Business requirement: Basic, minimally processed ingredients (e.g., "Vollmilch frisch")
+		// should rank higher than heavily processed alternatives (e.g., milk powder, milk drinks)
+		// to encourage healthier food choices in meal planning
+		const basicMilkIndex = suggestions.findIndex((food) => {
+			const lower = food.name_de.toLowerCase();
+			return lower.includes("vollmilch") && lower.includes("frisch");
+		});
 		const milkPowderIndex = suggestions.findIndex((food) =>
 			food.name_de.toLowerCase().includes("milchpulver"),
 		);
@@ -86,6 +89,7 @@ describe("suggestBlsFoods", () => {
 
 		// Basic milk should appear, and if processed products appear, they should rank lower
 		expect(basicMilkIndex).toBeGreaterThanOrEqual(0);
+		expect(suggestions[basicMilkIndex].name_de).toBe("Vollmilch frisch");
 
 		if (milkPowderIndex >= 0) {
 			expect(basicMilkIndex).toBeLessThan(milkPowderIndex);
