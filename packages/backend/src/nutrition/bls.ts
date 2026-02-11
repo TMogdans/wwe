@@ -89,6 +89,28 @@ export function searchFoods(
 // This ensures substring matches rank higher than similar-length unrelated words
 const SUBSTRING_MATCH_BONUS = 0.1;
 
+// Penalty keywords: words that indicate processed/complex products
+// These products should rank lower than basic ingredients
+const PENALTY_KEYWORDS = [
+	"pulver", // Milchpulver, Kakaopulver
+	"getränk", // Milchmischgetränk
+	"drink", // alternative to getränk
+	"backteig", // Milchbackteig
+	"teig", // general baked goods
+	"dessert", // desserts
+	"eis", // ice cream
+	"reis", // milk rice, apple rice
+	"küchlein", // small cakes
+	"gesüßt", // sweetened products
+	"süß", // sweet variants
+	"aromatisiert", // flavored
+	"zubereitung", // preparations
+	"fermentiert", // fermented
+	"gebraten", // fried
+	"frittiert", // deep-fried
+	"angereichert", // enriched
+];
+
 export function suggestBlsFoods(
 	db: DatabaseSync,
 	ingredientName: string,
