@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type RecipeDetail, fetchRecipe } from "../api.js";
+import { useWakeLock } from "../hooks/useWakeLock.js";
 import { scaleAmount } from "../utils/scale-amount.js";
 import "../styles/cook-mode.css";
 
@@ -114,6 +115,7 @@ function parseServings(value: string | undefined): number {
 }
 
 export function CookMode({ slug, portionen }: CookModeProps) {
+	useWakeLock();
 	const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [currentStep, setCurrentStep] = useState(0);

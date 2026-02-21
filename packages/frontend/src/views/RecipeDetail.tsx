@@ -11,6 +11,7 @@ import { IngredientList } from "../components/IngredientList.js";
 import { NutritionTable } from "../components/NutritionTable.js";
 import { PortionCalculator } from "../components/PortionCalculator.js";
 import { StepList } from "../components/StepList.js";
+import { useWakeLock } from "../hooks/useWakeLock.js";
 import "../styles/detail.css";
 
 interface RecipeDetailProps {
@@ -24,6 +25,7 @@ function parseServings(value: string | undefined): number {
 }
 
 export function RecipeDetail({ slug }: RecipeDetailProps) {
+	useWakeLock();
 	const [recipe, setRecipe] = useState<RecipeDetailType | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [servings, setServings] = useState<number | null>(null);
