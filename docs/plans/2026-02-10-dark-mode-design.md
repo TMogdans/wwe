@@ -1,7 +1,7 @@
 # Dark Mode Design
 
 **Datum**: 2026-02-10
-**Issue**: [#018](../../_issues/018-dark-mode.md)
+**Issue**: [#018](../../_issues/done/018-dark-mode.md)
 
 ## Übersicht
 
