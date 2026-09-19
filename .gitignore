@@ -8,3 +8,7 @@ rezepte/bls.sqlite
 rezepte/bls.sqlite-shm
 rezepte/bls.sqlite-wal
 .worktrees/
+
+# Zugangsdaten und persönliche Daten — dieses Repo ist öffentlich
+.credentials
+docs/ernaehrung/
